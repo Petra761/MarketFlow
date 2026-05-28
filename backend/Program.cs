@@ -45,10 +45,6 @@ builder.Services.AddScoped<IStockRepositorio, StockRepositorio>();
 
 builder.Services.AddScoped<IPrecioRepositorio, PrecioRepositorio>();
 
-builder.Services.AddScoped<IProductoRepositorio, ProductoRepositorio>();
-
-builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
-
 var app = builder.Build();
 
 // Swagger + Scalar
