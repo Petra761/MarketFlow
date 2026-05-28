@@ -39,6 +39,13 @@ builder.Services.AddScoped<IStockRepositorio, StockRepositorio>();
 
 builder.Services.AddScoped<IPrecioRepositorio, PrecioRepositorio>();
 
+builder.Services.AddScoped<ITelefonoRepositorio, TelefonoRepositorio>();
+
+builder.Services.AddScoped<ITelefono_UsuarioRepositorio, Telefono_UsuarioRepositorio>();
+
+builder.Services.AddScoped<IIntento_LoginRepositorio, Intento_LoginRepositorio>();
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
