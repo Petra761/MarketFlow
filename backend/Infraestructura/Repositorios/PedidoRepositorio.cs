@@ -51,10 +51,10 @@ namespace backend.Infraestructura.Repositorios
             {
                 throw new Exception("El pedido ya existe");
             }
-            // var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
-            // if(Usuario == null)            {
-            //     throw new Exception("El usuario no existe");
-            // }
+            var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
+             if(Usuario == null)            {
+                throw new Exception("El usuario no existe");
+            }
             var MetodoPago = await _context.Metodo_Pago.FirstOrDefaultAsync(m => m.CodigoMetodoPago == dto.CodigoMetodoPago && m.Estado == "Activo");
             if(MetodoPago == null)            
             {
@@ -62,7 +62,7 @@ namespace backend.Infraestructura.Repositorios
             }
             var pedido = new Pedido
             {
-                IdUsuario = 2,
+                IdUsuario = Usuario.IdUsuario,
                 IdMetodoPago = MetodoPago.IdMetodoPago,
                 CodigoPedido = dto.CodigoPedido,
                 Fecha = dto.Fecha,
@@ -72,27 +72,37 @@ namespace backend.Infraestructura.Repositorios
             _context.Pedido.Add(pedido);
             await _context.SaveChangesAsync();
 
+            await _context.Entry(pedido)
+                .Reference(p => p.Usuario)
+                .LoadAsync();
+
+            await _context.Entry(pedido)
+                .Reference(p => p.MetodoPago)
+                .LoadAsync();
+
             return pedido.toPedidoDTO();
         }
         public async Task<PedidoDTO> PutPedido(string CodigoPedido, [FromBody] PedidoDTO dto)
         {
             var pedido = await _context.Pedido
-                        .FirstOrDefaultAsync(p =>
-                            p.CodigoPedido == CodigoPedido &&
-                            p.Estado == "Activo");
+                    .Include(p => p.Usuario)
+                    .Include(p => p.MetodoPago)
+                    .FirstOrDefaultAsync(p =>
+                        p.CodigoPedido == CodigoPedido &&
+                        p.Estado == "Activo");
             if(pedido == null)
             {
                 throw new Exception("El pedido no existe");
             }
-            // var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
-            // if(Usuario == null)            {
-            //     throw new Exception("El usuario no existe");
-            // }
+            var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
+            if(Usuario == null)            {
+                throw new Exception("El usuario no existe");
+            }
             var MetodoPago = await _context.Metodo_Pago.FirstOrDefaultAsync(m => m.CodigoMetodoPago == dto.CodigoMetodoPago && m.Estado == "Activo");
             if(MetodoPago == null)            {
                 throw new Exception("El metodo de pago no existe");
             }
-            pedido.IdUsuario = 2;
+            pedido.IdUsuario = Usuario.IdUsuario;
             pedido.IdMetodoPago = MetodoPago.IdMetodoPago;
             pedido.Fecha = dto.Fecha;
             pedido.Total = dto.Total;
@@ -112,7 +122,12 @@ namespace backend.Infraestructura.Repositorios
         }
          public async Task<PedidoDTO> DeletePedido(string CodigoPedido)
         {
-            var pedido = await _context.Pedido.FirstOrDefaultAsync(p => p.CodigoPedido == CodigoPedido && p.Estado == "Activo");
+            var pedido = await _context.Pedido
+                        .Include(p => p.Usuario)
+                        .Include(p => p.MetodoPago)
+                        .FirstOrDefaultAsync(p =>
+                            p.CodigoPedido == CodigoPedido &&
+                            p.Estado == "Activo");
             if(pedido == null)
             {
                 throw new Exception("El pedido no existe");
