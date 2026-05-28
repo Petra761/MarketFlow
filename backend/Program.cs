@@ -5,9 +5,12 @@ using Marketflow.Infraestructura.Data;
 using Marketflow.Infraestructura.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using backend.Dominio.Interfaces;
+using backend.Infraestructura.Repositorios;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Controllers
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
@@ -17,14 +20,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<MarketflowContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
         "AllowAll",
-        policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
     );
 });
 
@@ -45,8 +51,10 @@ builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
 
 var app = builder.Build();
 
+// Swagger + Scalar
 if (app.Environment.IsDevelopment())
 {
+    // OpenAPI
     app.MapOpenApi();
 
     app.UseSwagger();
@@ -63,3 +71,4 @@ app.UseCors("AllowAll");
 app.MapControllers();
 
 app.Run();
+
