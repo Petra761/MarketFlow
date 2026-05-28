@@ -10,10 +10,10 @@ namespace backend.Dominio.Interfaces
 {
     public interface IProductoRepositorio
     {
-        Task<ProductoDTO> GetProductos();
+        Task<List<ProductoDTO>> GetProductos();
         Task<ProductoDTO> GetProducto(string codigo);
-        Task<ProductoDTO>PostProducto([FromBody] ProductoDTO producto);
-        Task<ProductoDTO>PutProducto([FromBody] ProductoDTO producto);
-        Task<ProductoDTO>DeleteProducto(string codigo);
+        Task<ProductoDTO> PostProducto([FromBody] ProductoDTO producto);
+        Task<ProductoDTO> PutProducto(string codigo,[FromBody] ProductoDTO producto);
+        Task<ProductoDTO> DeleteProducto(string codigo);
     }
 }
