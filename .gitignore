@@ -435,4 +435,6 @@ sketch
 
 /backend/appsettings.json
 /backend/Dockerfile
+/backend/Migrations
+/backend/bin
 
