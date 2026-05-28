@@ -16,7 +16,7 @@ namespace Marketflow.Dominio.Entidades
         public string CodigoLote { get; set; } = string.Empty;
         public DateOnly Fecha { get; set; }
         public int StockInicial { get; set; }
-        public int StockFinal { get; set; }
+        public int StockActual { get; set; }
         public string Estado { get; set; } = "Activo";
 
         [ForeignKey("IdProducto")]
