@@ -7,7 +7,10 @@ using backend.Dominio.Interfaces;
 using Marketflow.Infraestructura.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
-
+using System.Text.RegularExpressions;
+using backend.Dominio.DTOs;
+using System.Net;
+using System.Net.Mail;
 namespace backend.Infraestructura.Repositorios
 {
     public class UsuarioRepositorio : IUsuarioRepositorio
@@ -36,17 +39,50 @@ namespace backend.Infraestructura.Repositorios
                 .FirstOrDefaultAsync(u => u.CodigoUsuario == codigo);
         }
 
-        public async Task<Usuario?> CrearUsuario(Usuario usuario)
+        public async Task<Usuario?>CrearUsuario(Usuario usuario)
         {
-            var rolExiste = await _context.Rol.FirstOrDefaultAsync(r => r.IdRol == usuario.IdRol && r.Estado == "Activo");
-            usuario.FechaRegistro = DateOnly.FromDateTime(DateTime.Now);
-
-            if (rolExiste == null)
+            if (
+                string.IsNullOrWhiteSpace(usuario.Nombre) ||
+                string.IsNullOrWhiteSpace(usuario.Correo) ||
+                string.IsNullOrWhiteSpace(usuario.Contrasenia)
+            )
             {
-                return null;
+                throw new Exception(
+                    "Todos los campos son obligatorios"
+                );
             }
 
-            usuario.Contrasenia = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenia);
+            if (usuario.Contrasenia.Length < 8)
+            {
+                throw new Exception(
+                    "La contraseña debe tener mínimo 8 caracteres"
+                );
+            }
+            bool emailValido = Regex.IsMatch(
+            usuario.Correo,
+            @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+            );
+
+            if (!emailValido)
+            {
+                throw new Exception(
+                    "El correo no tiene un formato válido"
+                );
+            }
+
+            bool existe = await _context.Usuario
+                .AnyAsync(u => u.Correo == usuario.Correo);
+
+            if (existe)
+            {
+                throw new Exception(
+                    "El correo ya está registrado"
+                );
+            }
+
+            usuario.Contrasenia =
+                BCrypt.Net.BCrypt.HashPassword(
+                    usuario.Contrasenia);
 
             _context.Usuario.Add(usuario);
 
@@ -102,6 +138,171 @@ namespace backend.Infraestructura.Repositorios
 
             return true;
         }
+
+        public async Task<Usuario?> IniciarSesion(LoginDTO dto)
+        {
+            if (
+                string.IsNullOrWhiteSpace(dto.Correo) ||
+                string.IsNullOrWhiteSpace(dto.Contrasenia)
+            )
+            {
+                throw new Exception( "Correo y contraseña son obligatorios");
+            }
+
+            var usuario = await _context.Usuario
+                .Include(u => u.Rol)
+                .FirstOrDefaultAsync(
+                    u => u.Correo == dto.Correo
+                );
+
+            if (usuario == null) throw new Exception( "El correo no existe");
+            
+            int intentosFallidos =
+            await _context.Intento_Login
+            .CountAsync(i =>
+                i.IdUsuario == usuario.IdUsuario &&
+                i.Estado == "Fallido" &&
+                i.FechaIntento >
+                    DateTime.UtcNow.AddMinutes(-1)
+            );
+
+            if (intentosFallidos >= 5)
+            {
+                throw new Exception(
+                    "Cuenta bloqueada temporalmente"
+                );
+            }
+
+
+            bool passwordCorrecta =
+                BCrypt.Net.BCrypt.Verify(
+                    dto.Contrasenia,
+                    usuario.Contrasenia
+                );
+
+            if (!passwordCorrecta)
+            {
+                var intento =
+                new Intento_Login
+                {
+                    IdUsuario = usuario.IdUsuario,
+                    FechaIntento = DateTime.UtcNow,
+                    Estado = "Fallido"
+                };
+
+                _context.Intento_Login
+                    .Add(intento);
+
+                await _context.SaveChangesAsync();
+
+                throw new Exception(
+                    "Contraseña incorrecta"
+                );
+            }
+
+            return usuario;
+        }
+
+        //Mandar link del correo
+        public async Task RecuperarCuenta(string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo))
+            {
+                throw new Exception(
+                    "El correo es obligatorio"
+                );
+            }
+
+            var usuario = await _context.Usuario
+                .FirstOrDefaultAsync(
+                    u => u.Correo == correo
+                );
+
+            if (usuario == null)
+            {
+                throw new Exception(
+                    "El correo no existe"
+                );
+            }
+
+            string link =
+            $"http://localhost:5173/api/Usuarios/CambiarPassword";
+
+            await EnviarCorreoRecuperacion(
+                correo,
+                link
+            );
+        }
+         private async Task EnviarCorreoRecuperacion(string correo,string link)
+        {
+            var mail = new MailMessage();
+
+            mail.From = new MailAddress(
+                "garzonale123@gmail.com"
+            );
+
+            mail.To.Add(correo);
+
+            mail.Subject = "Recuperar contraseña";
+
+            mail.IsBodyHtml = true;
+
+            mail.Body = $@"
+                <h2>Recuperación de cuenta</h2>
+
+                <p>Haz click aquí:</p>
+
+                <a href='{link}'>
+                    Cambiar contraseña
+                </a>
+            ";
+
+            using var smtp = new SmtpClient(
+                "smtp.gmail.com",
+                587
+            );
+
+            smtp.Credentials = new NetworkCredential(
+                "garzonale123@gmail.com",
+                "ndshrcsjgvwrkvut"
+            );
+
+            smtp.EnableSsl = true;
+
+            await smtp.SendMailAsync(mail);
+        }
+
+
+        //Cambiar Contrasenia 
+        public async Task CambiarContrasenia(CambiarContraseniaDTO dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Correo) ||
+                string.IsNullOrWhiteSpace(dto.NuevaPassword)) throw new Exception("Todos los campos son obligatorios");
+            
+
+            if (dto.NuevaPassword.Length < 8) throw new Exception("La contraseña debe tener mínimo 8 caracteres");
+
+            var usuario = await _context.Usuario
+                .FirstOrDefaultAsync(
+                    u => u.Correo == dto.Correo
+                );
+
+            if (usuario == null)
+            {
+                throw new Exception(
+                    "Usuario no encontrado"
+                );
+            }
+
+            usuario.Contrasenia =
+                BCrypt.Net.BCrypt.HashPassword(
+                    dto.NuevaPassword
+                );
+
+            await _context.SaveChangesAsync();
+        }
+            
     }
+    
 }
 
