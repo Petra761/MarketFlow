@@ -51,6 +51,7 @@ builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 
+builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
 
 builder.Services.AddScoped<IReporteAdminRepositorio, ReporteRepositorio>();
 
