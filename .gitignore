@@ -432,8 +432,6 @@ thumb
 sketch
 
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore,node,react,dotnetcore
-
-/backend/appsettings.json/
-/backend/Dockerfile/
-/backend/Migrations/
-/backend/bin/
+Migrations/
+bin/
+appsettings.json
