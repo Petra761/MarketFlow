@@ -98,5 +98,15 @@ namespace backend.API.Controllers
 
             return Ok(productos);
         }
+
+        [HttpGet("EstadisticasUsuarios")]
+        public async Task<IActionResult> ObtenerEstadisticasUsuarios()
+        {
+            var resultado = await _reporteRepositorio
+                .ObtenerCrecimientoUsuarios();
+
+            return Ok(resultado);
+        }
+
     }
 }

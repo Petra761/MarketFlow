@@ -15,5 +15,6 @@ namespace backend.Dominio.Interfaces
         Task<List<VentasCategoriaDTO>> ObtenerVentasCategoria();
         Task<List<VentasGraficaDTO>> ObtenerVentasPorRangoFechas(DateOnly fechaInicio, DateOnly fechaFin);
         Task<List<ProductoMasVendidoDTO>> ObtenerProductosMasVendidos();
+        Task<List<UsuarioEstadisticaDTO>>ObtenerCrecimientoUsuarios();
     }
 }

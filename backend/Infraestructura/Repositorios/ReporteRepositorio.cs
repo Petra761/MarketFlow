@@ -186,5 +186,30 @@ namespace backend.Infraestructura.Repositorios
 
             return productos;
         }
+        public async Task<List<UsuarioEstadisticaDTO>>ObtenerCrecimientoUsuarios()
+        {
+                var datos = await _context.Usuario
+                .Where(u => u.Estado == "Activo")
+                .GroupBy(u => new
+                {
+                    u.FechaRegistro.Year,
+                    u.FechaRegistro.Month
+                })
+                .Select(g => new
+                {
+                    g.Key.Year,
+                    g.Key.Month,
+                    CantidadUsuarios = g.Count()
+                })
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ToListAsync();
+
+            return datos.Select(x => new UsuarioEstadisticaDTO
+            {
+                Periodo = $"{x.Month}/{x.Year}",
+                CantidadUsuarios = x.CantidadUsuarios
+            }).ToList();
+        }
     }
 }
