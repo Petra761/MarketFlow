@@ -20,6 +20,7 @@ namespace backend.Dominio.Interfaces
         Task CambiarContrasenia(CambiarContraseniaDTO dto);
         Task<bool>BloquearUsuario(string codigo);
         Task<bool>DesbloquearUsuario(string codigo);
+        Task<Usuario?> ObtenerPorCodigoActualizar(string codigo);
 
 
     }

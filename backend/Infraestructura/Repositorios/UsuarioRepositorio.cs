@@ -350,6 +350,14 @@ namespace backend.Infraestructura.Repositorios
             return true;
         }
 
+        public async Task<Usuario?> ObtenerPorCodigoActualizar(string codigo)
+        {
+            return await _context.Usuario
+                .FirstOrDefaultAsync(u =>
+                    u.CodigoUsuario == codigo &&
+                    u.Estado == "Activo");
+        }
+
     }
     
 }

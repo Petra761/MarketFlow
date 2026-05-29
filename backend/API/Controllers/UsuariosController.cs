@@ -184,6 +184,20 @@ namespace backend.API.Controllers
             }
         }
 
+        [HttpGet("Perfil/{codigo}")]
+        public async Task<IActionResult> ObtenerPerfil(string codigo)
+        {
+            var usuario = await _usuarioRepositorio
+                .ObtenerPorCodigoActualizar(codigo);
+
+            if (usuario == null)
+                return NotFound();
+
+            var dto = UsuarioMapeador.ToPerfilDTO(usuario);
+
+            return Ok(dto);
+        }
+
         //Bloquear usuario 
         [HttpPatch("Desbloquear/{codigo}")]
         public async Task<IActionResult> Desbloquear(string codigo)
