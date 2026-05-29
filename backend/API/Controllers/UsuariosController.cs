@@ -61,7 +61,6 @@ namespace backend.API.Controllers
 
             var usuario = new Usuario
             {
-                CodigoUsuario = dto.CodigoUsuario,
                 IdRol = rol.IdRol,
                 Nombre = dto.Nombre,
                 Apellido = dto.Apellido,
@@ -69,9 +68,6 @@ namespace backend.API.Controllers
                 Correo = dto.Correo,
                 Contrasenia = dto.Contrasenia
             };
-
-            usuario.Contrasenia =
-                BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenia);
 
             await _usuarioRepositorio.CrearUsuario(usuario);
 
@@ -157,17 +153,9 @@ namespace backend.API.Controllers
 
         // PUT
         [HttpPut("ActualizarUsuario/{codigo}")]
-        public async Task<IActionResult> ActualizarUsuario(
-            string codigo,
-            UsuarioDTO dto)
+        public async Task<IActionResult> ActualizarUsuario(string codigo, UsuarioPutDTO dto)
         {
-            var rol = await _usuarioRepositorio
-                .ObtenerRolPorCodigo(dto.CodigoRol);
-
-            if (rol == null)
-                return BadRequest("El rol no existe");
-
-            var usuario = UsuarioMapeador.ToEntity(dto, rol.IdRol);
+            var usuario = UsuarioMapeador.ToEntityPut(dto);
 
             var actualizado = await _usuarioRepositorio
                 .ActualizarUsuario(codigo, usuario);

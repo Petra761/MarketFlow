@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 using backend.Dominio.DTOs;
 using System.Net;
 using System.Net.Mail;
+using backend.Dominio.Helpers;
+
 namespace backend.Infraestructura.Repositorios
 {
     public class UsuarioRepositorio : IUsuarioRepositorio
@@ -84,6 +86,8 @@ namespace backend.Infraestructura.Repositorios
                 BCrypt.Net.BCrypt.HashPassword(
                     usuario.Contrasenia);
 
+            usuario.CodigoUsuario = CodeGenerator.Generate("U");
+
             _context.Usuario.Add(usuario);
             await _context.SaveChangesAsync();
 
@@ -100,14 +104,6 @@ namespace backend.Infraestructura.Repositorios
             if (usuarioExistente == null)
                 return false;
 
-            var rolExiste = await _context.Rol
-                .FirstOrDefaultAsync(r =>
-                    r.IdRol == usuario.IdRol &&
-                    r.Estado == "Activo");
-
-            if (rolExiste == null)
-                return false;
-
             if (!string.IsNullOrWhiteSpace(usuario.Nombre))
                 usuarioExistente.Nombre = usuario.Nombre;
 
@@ -119,8 +115,6 @@ namespace backend.Infraestructura.Repositorios
 
             if (!string.IsNullOrWhiteSpace(usuario.Correo))
                 usuarioExistente.Correo = usuario.Correo;
-
-            usuarioExistente.IdRol = usuario.IdRol;
 
             if (!string.IsNullOrWhiteSpace(usuario.Contrasenia))
             {

@@ -14,13 +14,11 @@ namespace backend.Dominio.Mapeadores
         {
             return new UsuarioDTO
             {
-                CodigoUsuario = usuario.CodigoUsuario,
                 CodigoRol = usuario.Rol!.CodigoRol,
                 Nombre = usuario.Nombre,
                 Apellido = usuario.Apellido,
                 Nickname = usuario.Nickname,
-                Correo = usuario.Correo,
-                Contrasenia = usuario.Contrasenia
+                Correo = usuario.Correo
             };
         }
 
@@ -29,7 +27,6 @@ namespace backend.Dominio.Mapeadores
         {
             return new Usuario
             {
-                CodigoUsuario = dto.CodigoUsuario,
                 IdRol = idRol,
                 Nombre = dto.Nombre,
                 Apellido = dto.Apellido,
@@ -49,6 +46,18 @@ namespace backend.Dominio.Mapeadores
                 Apellido = usuario.Apellido,
                 Nickname = usuario.Nickname,
                 Correo = usuario.Correo
+            };
+        }
+
+        public static Usuario ToEntityPut(UsuarioPutDTO dto)
+        {
+            return new Usuario
+            {
+                Nombre = dto.Nombre,
+                Apellido = dto.Apellido,
+                Nickname = dto.Nickname,
+                Correo = dto.Correo,
+                Contrasenia = dto.Contrasenia
             };
         }
 
