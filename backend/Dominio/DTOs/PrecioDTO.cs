@@ -14,9 +14,7 @@ public class PrecioResponseDTO
 public class PrecioCreateDTO
 {
     public string CodigoProducto { get; set; } = string.Empty;
-    public string CodigoPrecio { get; set; } = string.Empty;
     public decimal Monto { get; set; }
-    public DateOnly FechaInicio { get; set; }
 }
 
 public class PrecioUpdateDTO

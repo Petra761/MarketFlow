@@ -13,9 +13,7 @@ public class StockResponseDTO
 public class StockCreateDTO
 {
     public string CodigoProducto { get; set; } = string.Empty;
-    public string CodigoLote { get; set; } = string.Empty;
     public int Cantidad { get; set; }
-    public DateOnly Fecha { get; set; }
 }
 
 public class StockUpdateDTO

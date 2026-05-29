@@ -7,7 +7,9 @@ using backend.Dominio.Helpers;
 using backend.Dominio.Interfaces;
 using backend.Dominio.Mapeadores;
 using backend.Infraestructura;
+using Marketflow.Dominio.DTOs;
 using Marketflow.Dominio.Entidades;
+using Marketflow.Dominio.Interfaces;
 using Marketflow.Infraestructura.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +19,18 @@ namespace Marketflow.Infraestructura.Repositorios
     public class ProductoRepositorio : IProductoRepositorio
     {
         private readonly MarketflowContext context1;
+        private readonly IStockRepositorio context2;
+        private readonly IPrecioRepositorio context3;
 
-        public ProductoRepositorio(MarketflowContext context)
+        public ProductoRepositorio(
+            MarketflowContext context,
+            IStockRepositorio stockrepo,
+            IPrecioRepositorio preciorepo
+        )
         {
             this.context1 = context;
+            this.context2 = stockrepo;
+            this.context3 = preciorepo;
         }
 
         public async Task<List<ProductoDTO>> GetProductos()
@@ -114,7 +124,20 @@ namespace Marketflow.Infraestructura.Repositorios
                 EstadoProducto = "Nuevo",
             };
             context1.Producto.Add(product);
+
             await context1.SaveChangesAsync();
+
+            if (producto.CantidadInicial != null)
+            {
+                var stock = new StockReposicionDTO
+                {
+                    CodigoProducto = codigoGenerado,
+                    CantidadIngreasada = producto.CantidadInicial ?? 0,
+                };
+
+                await context2.ReponerProducto(stock);
+            }
+            await context3.CrearPrecioAsync(producto.Precio, product.IdProducto);
 
             return product.toProductoDTO();
         }

@@ -1,3 +1,4 @@
+using backend.Dominio.Helpers;
 using Marketflow.Dominio.Entidades;
 using Marketflow.Dominio.Interfaces;
 using Marketflow.Infraestructura.Data;
@@ -42,10 +43,18 @@ public class PrecioRepositorio : IPrecioRepositorio
         return producto?.IdProducto ?? 0;
     }
 
-    public async Task<bool> CrearPrecioAsync(Precio precio)
+    public async Task<bool> CrearPrecioAsync(int precio, int idProducto)
     {
-        await _context.Precio.AddAsync(precio);
-        return await _context.SaveChangesAsync() > 0;
+        var nPrecio = new Precio
+        {
+            IdProducto = idProducto,
+            CodigoPrecio = CodeGenerator.Generate("PRE"),
+            Monto = precio,
+            FechaInicio = DateOnly.FromDateTime(DateTime.Now),
+        };
+        await _context.Precio.AddAsync(nPrecio);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> ActualizarPrecioAsync(Precio precio)
