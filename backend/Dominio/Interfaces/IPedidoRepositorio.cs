@@ -20,5 +20,6 @@ namespace backend.Dominio.Interfaces
         Task<PedidoDTO> DeletePedido(string CodigoPedido);
 
         Task<List<PedidoRecibidoDTO>> ObtenerPedidosPorVendedor(string codigoVendedor);
+        Task<string> PedidoRecibido(string codigoPedido);
     }
 }

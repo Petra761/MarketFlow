@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Dominio.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Marketflow.Infraestructura.Data;
 using backend.Dominio.DTOs;
+using backend.Dominio.Interfaces;
+using Marketflow.Infraestructura.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace backend.API.Controllers
 {
@@ -45,7 +45,11 @@ namespace backend.API.Controllers
         }
 
         [HttpPut("{codigo}/{codigoUsuario}")]
-        public async Task<IActionResult> PutProducto(string codigo, string codigoUsuario, [FromBody] ProductoDTO producto)
+        public async Task<IActionResult> PutProducto(
+            string codigo,
+            string codigoUsuario,
+            [FromBody] ProductoDTO producto
+        )
         {
             return Ok(await context1.PutProducto(codigo, codigoUsuario, producto));
         }
@@ -54,6 +58,17 @@ namespace backend.API.Controllers
         public async Task<IActionResult> Delete(string codigo, string codigoUsuario)
         {
             return Ok(await context1.DeleteProducto(codigo, codigoUsuario));
+        }
+
+        [HttpGet("stock-critico/{codigoVendedor}/{cantidad}")]
+        public async Task<IActionResult> StockCritico(string codigoVendedor, int cantidad)
+        {
+            var response = await context1.GetBajoStock(codigoVendedor, cantidad);
+
+            if (response is null)
+                return Ok($"Nada Por debajo de {cantidad}");
+
+            return Ok(response);
         }
     }
 }

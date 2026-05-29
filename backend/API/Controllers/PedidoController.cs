@@ -20,12 +20,14 @@ namespace backend.API.Controllers
         {
             this.context = context;
         }
+
         // GET: api/Pedido/Historial/5
         [HttpGet("Historial/{codigoUsuario}")]
         public async Task<IActionResult> GetHistorial(string codigoUsuario)
         {
             return Ok(await context.GetHistorial(codigoUsuario));
         }
+
         // GET: api/Pedido
         [HttpGet]
         public async Task<IActionResult> GetPedido()
@@ -53,6 +55,7 @@ namespace backend.API.Controllers
         {
             return Ok(await context.PutPedido(CodigoPedido, pedido));
         }
+
         // PUT: api/Pedido/Confirmar/5
         [HttpPut("Confirmar/{CodigoPedido}")]
         public async Task<IActionResult> ConfirmarPedido(string CodigoPedido)
@@ -60,6 +63,7 @@ namespace backend.API.Controllers
             await context.ConfirmarPedido(CodigoPedido);
             return Ok();
         }
+
         // PUT: api/Pedido/Cancelar/5
         [HttpPut("Cancelar/{CodigoPedido}")]
         public async Task<IActionResult> CancelarPedido(string CodigoPedido)
@@ -67,6 +71,7 @@ namespace backend.API.Controllers
             await context.CancelarPedido(CodigoPedido);
             return Ok();
         }
+
         // PUT: api/Pedido/Pagar/5
         [HttpPut("Pagar/{CodigoPedido}")]
         public async Task<IActionResult> PagarPedido(string CodigoPedido)
@@ -74,7 +79,8 @@ namespace backend.API.Controllers
             await context.PagarPedido(CodigoPedido);
             return Ok();
         }
-         // DELETE: api/Pedido/5
+
+        // DELETE: api/Pedido/5
         [HttpDelete("{CodigoPedido}")]
         public async Task<IActionResult> DeletePedido(string CodigoPedido)
         {
@@ -92,6 +98,16 @@ namespace backend.API.Controllers
             }
 
             return Ok(pedidos);
+        }
+
+        [HttpPatch("{codigoPedido}/entregar")]
+        public async Task<IActionResult> EntregarPedido(string codigoPedido)
+        {
+            var response = await context.PedidoRecibido(codigoPedido);
+            if (response == "")
+                return NotFound("No se encontro");
+
+            return Ok(response);
         }
     }
 }

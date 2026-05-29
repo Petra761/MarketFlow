@@ -25,10 +25,12 @@ namespace backend.Infraestructura.Repositorios
             this._context = context;
             this._stockRepositorio = stockRepositorio;
         }
+
         public async Task ConfirmarPedido(string codigoPedido)
         {
-            var pedido = await _context.Pedido
-                .FirstOrDefaultAsync(p => p.CodigoPedido == codigoPedido && p.Estado == "Activo");
+            var pedido = await _context.Pedido.FirstOrDefaultAsync(p =>
+                p.CodigoPedido == codigoPedido && p.Estado == "Activo"
+            );
 
             if (pedido == null)
                 throw new Exception("El pedido no existe");
@@ -36,8 +38,9 @@ namespace backend.Infraestructura.Repositorios
             if (pedido.EstadoPedido != "Pendiente")
                 throw new Exception("Solo se pueden confirmar pedidos pendientes");
 
-            var tieneDetalles = await _context.Detalle_Pedido
-                .AnyAsync(d => d.IdPedido == pedido.IdPedido);
+            var tieneDetalles = await _context.Detalle_Pedido.AnyAsync(d =>
+                d.IdPedido == pedido.IdPedido
+            );
 
             if (!tieneDetalles)
                 throw new Exception("No puedes confirmar un pedido sin productos");
@@ -67,10 +70,12 @@ namespace backend.Infraestructura.Repositorios
 
             await _context.SaveChangesAsync();
         }
+
         public async Task CancelarPedido(string codigoPedido)
         {
-            var pedido = await _context.Pedido
-                .FirstOrDefaultAsync(p => p.CodigoPedido == codigoPedido && p.Estado == "Activo");
+            var pedido = await _context.Pedido.FirstOrDefaultAsync(p =>
+                p.CodigoPedido == codigoPedido && p.Estado == "Activo"
+            );
 
             if (pedido == null)
                 throw new Exception("El pedido no existe");
@@ -90,10 +95,12 @@ namespace backend.Infraestructura.Repositorios
 
             await _context.SaveChangesAsync();
         }
+
         public async Task PagarPedido(string codigoPedido)
         {
-            var pedido = await _context.Pedido
-                .FirstOrDefaultAsync(p => p.CodigoPedido == codigoPedido && p.Estado == "Activo");
+            var pedido = await _context.Pedido.FirstOrDefaultAsync(p =>
+                p.CodigoPedido == codigoPedido && p.Estado == "Activo"
+            );
 
             if (pedido == null)
                 throw new Exception("El pedido no existe");
@@ -105,18 +112,19 @@ namespace backend.Infraestructura.Repositorios
 
             await _context.SaveChangesAsync();
         }
+
         public async Task<List<PedidoDTO>> GetHistorial(string codigoUsuario)
         {
-            var pedidos = await _context.Pedido
-                .Include(p => p.Usuario)
+            var pedidos = await _context
+                .Pedido.Include(p => p.Usuario)
                 .Include(p => p.MetodoPago)
-                .Where(p => p.Usuario.CodigoUsuario == codigoUsuario
-                        && p.Estado != "Inactivo")
+                .Where(p => p.Usuario.CodigoUsuario == codigoUsuario && p.Estado != "Inactivo")
                 .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
 
             return pedidos.Select(p => p.toPedidoDTO()).ToList();
         }
+
         public async Task<List<PedidoDTO>> GetPedido()
         {
             var almacen = await _context
@@ -142,6 +150,7 @@ namespace backend.Infraestructura.Repositorios
 
             return pedido.toPedidoDTO();
         }
+
         public async Task<PedidoDTO> PostPedido([FromBody] CreatePedidoDTO dto)
         {
             var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
@@ -162,36 +171,37 @@ namespace backend.Infraestructura.Repositorios
                 CodigoPedido = CodeGenerator.Generate("PED"),
                 Fecha = dto.Fecha,
                 Total = 0,
-                EstadoPedido = "Pendiente"
+                EstadoPedido = "Pendiente",
             };
             _context.Pedido.Add(pedido);
             await _context.SaveChangesAsync();
 
             return pedido.toPedidoDTO();
         }
+
         public async Task<PedidoDTO> PutPedido(string CodigoPedido, UpdatePedidoDTO dto)
         {
-            var pedido = await _context.Pedido
-                .Include(p => p.Usuario)
+            var pedido = await _context
+                .Pedido.Include(p => p.Usuario)
                 .Include(p => p.MetodoPago)
-                .FirstOrDefaultAsync(p =>
-                    p.CodigoPedido == CodigoPedido &&
-                    p.Estado == "Activo");
+                .FirstOrDefaultAsync(p => p.CodigoPedido == CodigoPedido && p.Estado == "Activo");
 
             if (pedido == null)
                 throw new Exception("El pedido no existe");
 
             if (pedido.EstadoPedido != "Pendiente")
                 throw new Exception("Solo pedidos pendientes pueden modificarse");
-                
-            var Usuario = await _context.Usuario
-                .FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
+
+            var Usuario = await _context.Usuario.FirstOrDefaultAsync(u =>
+                u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo"
+            );
 
             if (Usuario == null)
                 throw new Exception("El usuario no existe");
 
-            var MetodoPago = await _context.Metodo_Pago
-                .FirstOrDefaultAsync(m => m.CodigoMetodoPago == dto.CodigoMetodoPago && m.Estado == "Activo");
+            var MetodoPago = await _context.Metodo_Pago.FirstOrDefaultAsync(m =>
+                m.CodigoMetodoPago == dto.CodigoMetodoPago && m.Estado == "Activo"
+            );
 
             if (MetodoPago == null)
                 throw new Exception("El metodo de pago no existe");
@@ -203,13 +213,9 @@ namespace backend.Infraestructura.Repositorios
 
             await _context.SaveChangesAsync();
 
-            await _context.Entry(pedido)
-                .Reference(p => p.Usuario)
-                .LoadAsync();
+            await _context.Entry(pedido).Reference(p => p.Usuario).LoadAsync();
 
-            await _context.Entry(pedido)
-                .Reference(p => p.MetodoPago)
-                .LoadAsync();
+            await _context.Entry(pedido).Reference(p => p.MetodoPago).LoadAsync();
 
             return pedido.toPedidoDTO();
         }
@@ -288,6 +294,22 @@ namespace backend.Infraestructura.Repositorios
                 .ToList();
 
             return resultado;
+        }
+
+        public async Task<string> PedidoRecibido(string codigoPedido)
+        {
+            var pedido = await (
+                from p in _context.Pedido
+                where p.CodigoPedido == codigoPedido
+                select p
+            ).FirstOrDefaultAsync();
+
+            if (pedido is null)
+                return "";
+            pedido.Estado = "Entregado";
+            await _context.SaveChangesAsync();
+
+            return "Se actualizo correctamente";
         }
     }
 }
