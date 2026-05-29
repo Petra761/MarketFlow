@@ -56,6 +56,8 @@ builder.Services.AddScoped<ITelefono_UsuarioRepositorio, Telefono_UsuarioReposit
 
 builder.Services.AddScoped<IIntento_LoginRepositorio, Intento_LoginRepositorio>();
 
+builder.Services.AddScoped<IReporteAdminRepositorio, ReporteRepositorio>();
+
 var app = builder.Build();
 
 // Swagger + Scalar

@@ -27,7 +27,7 @@ namespace backend.API.Controllers
         {
             var usuarios = await _usuarioRepositorio.ListarUsuarios();
 
-            var usuariosDTO = UsuarioMapeador.ToDTOList(usuarios);
+            var usuariosDTO = UsuarioMapeador.ToGetDTOList(usuarios);
 
             return Ok(usuariosDTO);
         }
@@ -42,26 +42,43 @@ namespace backend.API.Controllers
             if (usuario == null)
                 return NotFound();
 
-            var usuarioDTO = UsuarioMapeador.ToDTO(usuario);
+            var usuarioDTO = UsuarioMapeador.ToGetDTO(usuario);
 
             return Ok(usuarioDTO);
         }
 
         // POST
-        [HttpPost("CrearUsuario")]
+        [HttpPost]
         public async Task<IActionResult> CrearUsuario(UsuarioDTO dto)
         {
-            var usuario = UsuarioMapeador.ToEntity(dto);
-            usuario.Estado = "Activo";
+            var rol = await _usuarioRepositorio
+                .ObtenerRolPorCodigo(dto.CodigoRol);
 
-            var resultado = await _usuarioRepositorio.CrearUsuario(usuario);
-
-            if (resultado == null)
+            if (rol == null)
             {
-                return BadRequest(new {mensaje = "No se logro crear el usuario."});
+                return BadRequest("El rol no existe");
             }
 
-            return Ok(resultado);
+            var usuario = new Usuario
+            {
+                CodigoUsuario = dto.CodigoUsuario,
+                IdRol = rol.IdRol,
+                Nombre = dto.Nombre,
+                Apellido = dto.Apellido,
+                Nickname = dto.Nickname,
+                Correo = dto.Correo,
+                Contrasenia = dto.Contrasenia
+            };
+
+            usuario.Contrasenia =
+                BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenia);
+
+            await _usuarioRepositorio.CrearUsuario(usuario);
+
+            return Ok(new
+            {
+                mensaje = "Usuario creado correctamente"
+            });
         }
 
         // PUT
@@ -70,7 +87,13 @@ namespace backend.API.Controllers
             string codigo,
             UsuarioDTO dto)
         {
-            var usuario = UsuarioMapeador.ToEntity(dto);
+            var rol = await _usuarioRepositorio
+                .ObtenerRolPorCodigo(dto.CodigoRol);
+
+            if (rol == null)
+                return BadRequest("El rol no existe");
+
+            var usuario = UsuarioMapeador.ToEntity(dto, rol.IdRol);
 
             var actualizado = await _usuarioRepositorio
                 .ActualizarUsuario(codigo, usuario);

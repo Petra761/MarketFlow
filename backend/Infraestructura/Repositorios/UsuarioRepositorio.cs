@@ -38,18 +38,9 @@ namespace backend.Infraestructura.Repositorios
 
         public async Task<Usuario?> CrearUsuario(Usuario usuario)
         {
-            var rolExiste = await _context.Rol.FirstOrDefaultAsync(r => r.IdRol == usuario.IdRol && r.Estado == "Activo");
             usuario.FechaRegistro = DateOnly.FromDateTime(DateTime.Now);
 
-            if (rolExiste == null)
-            {
-                return null;
-            }
-
-            usuario.Contrasenia = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenia);
-
             _context.Usuario.Add(usuario);
-
             await _context.SaveChangesAsync();
 
             return usuario;
@@ -57,26 +48,41 @@ namespace backend.Infraestructura.Repositorios
 
         public async Task<bool> ActualizarUsuario(string codigo, Usuario usuario)
         {
-            var usuarioExistente = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == codigo && u.Estado == "Activo");
+            var usuarioExistente = await _context.Usuario
+                .FirstOrDefaultAsync(u =>
+                    u.CodigoUsuario == codigo &&
+                    u.Estado == "Activo");
 
             if (usuarioExistente == null)
                 return false;
 
-            var rolExiste = await _context.Rol.FirstOrDefaultAsync(r => r.IdRol == usuario.IdRol && r.Estado == "Activo");
+            var rolExiste = await _context.Rol
+                .FirstOrDefaultAsync(r =>
+                    r.IdRol == usuario.IdRol &&
+                    r.Estado == "Activo");
 
-            if (rolExiste == null) 
+            if (rolExiste == null)
                 return false;
 
-            usuarioExistente.Nombre = usuario.Nombre;
-            usuarioExistente.Apellido = usuario.Apellido;
-            usuarioExistente.Nickname = usuario.Nickname;
-            usuarioExistente.Correo = usuario.Correo;
-            usuarioExistente.Contrasenia = usuario.Contrasenia;
-            usuarioExistente.Estado = usuario.Estado;
-            usuarioExistente.CodigoUsuario = usuario.CodigoUsuario;
+            if (!string.IsNullOrWhiteSpace(usuario.Nombre))
+                usuarioExistente.Nombre = usuario.Nombre;
+
+            if (!string.IsNullOrWhiteSpace(usuario.Apellido))
+                usuarioExistente.Apellido = usuario.Apellido;
+
+            if (!string.IsNullOrWhiteSpace(usuario.Nickname))
+                usuarioExistente.Nickname = usuario.Nickname;
+
+            if (!string.IsNullOrWhiteSpace(usuario.Correo))
+                usuarioExistente.Correo = usuario.Correo;
+
             usuarioExistente.IdRol = usuario.IdRol;
 
-            usuarioExistente.Contrasenia = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenia);
+            if (!string.IsNullOrWhiteSpace(usuario.Contrasenia))
+            {
+                usuarioExistente.Contrasenia =
+                    BCrypt.Net.BCrypt.HashPassword(usuario.Contrasenia);
+            }
 
             _context.Usuario.Update(usuarioExistente);
 
@@ -102,6 +108,15 @@ namespace backend.Infraestructura.Repositorios
 
             return true;
         }
+
+        public async Task<Rol?> ObtenerRolPorCodigo(string codigoRol)
+        {
+            return await _context.Rol
+                .FirstOrDefaultAsync(r =>
+                    r.CodigoRol == codigoRol &&
+                    r.Estado == "Activo");
+        }
+
     }
 }
 
