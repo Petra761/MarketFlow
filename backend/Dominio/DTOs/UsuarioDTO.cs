@@ -8,7 +8,7 @@ namespace backend.Dominio.DTOs
     public class UsuarioDTO
     {
         public string CodigoUsuario { get; set; } = string.Empty;
-        public int IdRol { get; set; }
+        public string CodigoRol { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
         public string Apellido { get; set; } = string.Empty;
         public string Nickname { get; set; } = string.Empty;

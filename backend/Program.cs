@@ -52,6 +52,7 @@ builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 
 
+builder.Services.AddScoped<IReporteAdminRepositorio, ReporteRepositorio>();
 
 var app = builder.Build();
 
