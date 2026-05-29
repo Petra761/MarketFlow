@@ -104,6 +104,44 @@ namespace backend.Infraestructura.Repositorios
             if (usuarioExistente == null)
                 return false;
 
+            if (!string.IsNullOrWhiteSpace(usuario.Correo))
+            {
+                bool emailValido = Regex.IsMatch(
+                    usuario.Correo,
+                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                );
+
+                if (!emailValido)
+                {
+                    throw new Exception(
+                        "El correo no tiene un formato válido"
+                    );
+                }
+
+                bool existe = await _context.Usuario
+                    .AnyAsync(u =>
+                        u.Correo == usuario.Correo &&
+                        u.CodigoUsuario != codigo);
+
+                if (existe)
+                {
+                    throw new Exception(
+                        "El correo ya está registrado"
+                    );
+                }
+            }
+
+            // Validar contraseña si se envía
+            if (!string.IsNullOrWhiteSpace(usuario.Contrasenia))
+            {
+                if (usuario.Contrasenia.Length < 8)
+                {
+                    throw new Exception(
+                        "La contraseña debe tener mínimo 8 caracteres"
+                    );
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(usuario.Nombre))
                 usuarioExistente.Nombre = usuario.Nombre;
 
