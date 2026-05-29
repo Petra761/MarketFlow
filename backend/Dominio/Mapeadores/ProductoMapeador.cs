@@ -15,7 +15,6 @@ namespace backend.Dominio.Mapeadores
             return new ProductoDTO()
             {
 
-                CodigoProducto = producto.CodigoProducto,
                 CodigoUsuario = producto.Usuario?.CodigoUsuario ?? "N/A",
                 CodigoCategoria = producto.Categoria?.CodigoCategoria ?? "N/A",
                 Nombre = producto.Nombre,
