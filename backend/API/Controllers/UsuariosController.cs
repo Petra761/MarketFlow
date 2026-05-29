@@ -180,6 +180,38 @@ namespace backend.API.Controllers
                 mensaje = "Usuario actualizado correctamente"
             });
         }
+        //Bloquear usuario 
+        [HttpPatch("Bloquear/{codigo}")]
+        public async Task<IActionResult> Bloquear(string codigo)
+        {
+            
+            bool comprobante = await _usuarioRepositorio.BloquearUsuario(codigo);
+            if (comprobante)
+            {
+                return Ok(new{mensaje = "Se bloqueo correctamente"});
+            }
+            else
+            {
+                return Ok(new {mensaje = "Tu cuenta no existe o esta bloqueada"});
+            }
+        }
+
+        //Bloquear usuario 
+        [HttpPatch("Desbloquear/{codigo}")]
+        public async Task<IActionResult> Desbloquear(string codigo)
+        {
+            
+            bool comprobante = await _usuarioRepositorio.DesbloquearUsuario(codigo);
+            if (comprobante)
+            {
+                return Ok(new{mensaje = "Se Desbloqueo correctamente"});
+            }
+            else
+            {
+                return Ok(new {mensaje = "Tu cuenta no existe o esta activa"});
+            }
+        }
+
 
         // DELETE LOGICO
         [HttpDelete("EliminarUsuario/{codigo}")]
@@ -196,6 +228,7 @@ namespace backend.API.Controllers
                 mensaje = "Usuario eliminado correctamente"
             });
         }
+
     }
 }
 

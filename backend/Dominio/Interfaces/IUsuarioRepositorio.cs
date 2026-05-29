@@ -18,5 +18,9 @@ namespace backend.Dominio.Interfaces
         Task<Usuario?> IniciarSesion(LoginDTO dto);
         Task RecuperarCuenta(string correo);
         Task CambiarContrasenia(CambiarContraseniaDTO dto);
+        Task<bool>BloquearUsuario(string codigo);
+        Task<bool>DesbloquearUsuario(string codigo);
+
+
     }
 }

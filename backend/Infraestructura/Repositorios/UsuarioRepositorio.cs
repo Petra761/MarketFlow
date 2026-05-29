@@ -323,6 +323,38 @@ namespace backend.Infraestructura.Repositorios
                     r.CodigoRol == codigoRol &&
                     r.Estado == "Activo");
         }
+        public async Task<bool>BloquearUsuario(string codigo)
+        {
+            var usuario = await _context.Usuario
+                .FirstOrDefaultAsync(u => 
+                u.CodigoUsuario == codigo &&
+                u.Estado == "Activo");
+            if(usuario == null)
+            {
+                 return false;
+            }
+            usuario.Estado = "Bloqueado";
+            _context.Usuario.Update(usuario);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+          public async Task<bool>DesbloquearUsuario(string codigo)
+        {
+            var usuario = await _context.Usuario
+                .FirstOrDefaultAsync(u => 
+                u.CodigoUsuario == codigo &&
+                u.Estado == "Bloqueado");
+            if(usuario == null)
+            {
+                 return false;
+            }
+            usuario.Estado = "Activo";
+            _context.Usuario.Update(usuario);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
     }
     
