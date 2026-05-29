@@ -79,7 +79,7 @@ namespace Marketflow.Infraestructura.Repositorios
                 .ToList();
         }
 
-        public async Task<ProductoDTO> PostProducto([FromBody] ProductoDTO producto)
+        public async Task<ProductoDTO> PostProducto([FromBody] mProductoDTO producto)
         {
             if (string.IsNullOrEmpty(producto.Nombre))
                 throw new Exception("El nombre del producto es obligatorio.");

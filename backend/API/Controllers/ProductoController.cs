@@ -39,7 +39,7 @@ namespace backend.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostProducto([FromBody] ProductoDTO producto)
+        public async Task<IActionResult> PostProducto([FromBody] mProductoDTO producto)
         {
             return Ok(await context1.PostProducto(producto));
         }

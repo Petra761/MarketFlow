@@ -12,7 +12,7 @@ namespace backend.Dominio.Interfaces
     {
         Task<List<CategoriaDTO>> GetCategorias();
         Task<CategoriaDTO> GetCategoria(string codigo);
-        Task<CategoriaDTO> PostCategoria([FromBody] CategoriaDTO categoria);
+        Task<CategoriaDTO> PostCategoria([FromBody] mCategoriaDTO categoria);
         Task<CategoriaDTO> DeleteCategoria(string codigo);
         Task<CategoriaDTO> PutCategoria(string codigo,[FromBody] CategoriaDTO dto);
     }

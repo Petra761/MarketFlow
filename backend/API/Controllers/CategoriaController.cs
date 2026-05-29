@@ -31,7 +31,7 @@ namespace backend.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostCategoria([FromBody] CategoriaDTO categoria)
+        public async Task<IActionResult> PostCategoria([FromBody] mCategoriaDTO categoria)
         {
             return Ok(await context1.PostCategoria(categoria));
         }

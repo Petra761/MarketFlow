@@ -11,4 +11,8 @@ namespace backend.Dominio.DTOs
         public string Nombre { get; set; } = string.Empty;
      
     }
+    public class mCategoriaDTO
+    {
+        public string Nombre { get; set; } = string.Empty;
+    }
 }

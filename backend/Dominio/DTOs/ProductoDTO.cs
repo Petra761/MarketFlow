@@ -7,7 +7,7 @@ namespace backend.Dominio.DTOs
 {
     public class ProductoDTO
     {
-        public string? CodigoProducto { get; set; }
+
         public string CodigoUsuario { get; set; } = string.Empty;
         public string CodigoCategoria { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
@@ -27,4 +27,16 @@ namespace backend.Dominio.DTOs
         public int Stock { get; set; }
         public string Estado { get; set; } = string.Empty;
     }
+
+    public class mProductoDTO
+    {
+        public string CodigoUsuario { get; set; } = string.Empty;
+        public string CodigoCategoria { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
+        public string Marca { get; set; } = string.Empty;
+        public DateOnly? Fecha { get; set; }
+        public string EstadoProducto { get; set; } = string.Empty;
+    }
+     
 }

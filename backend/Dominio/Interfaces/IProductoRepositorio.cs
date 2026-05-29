@@ -12,7 +12,7 @@ namespace backend.Dominio.Interfaces
     {
         Task<List<ProductoDTO>> GetProductos();
         Task<ProductoDTO> GetProducto(string codigo);
-        Task<ProductoDTO> PostProducto([FromBody] ProductoDTO producto);
+        Task<ProductoDTO> PostProducto([FromBody] mProductoDTO producto);
         Task<ProductoDTO> PutProducto(string codigo, string codigoUsuario, [FromBody] ProductoDTO producto);
         Task<ProductoDTO> DeleteProducto(string codigo, string codigoUsuario);
         Task<List<MisProductosDTO>> GetMisProductos(string codigoUsuario);

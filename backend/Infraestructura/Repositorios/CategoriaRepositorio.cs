@@ -38,7 +38,7 @@ namespace backend.Infraestructura.Repositorios
             return categoria.toCategoriaDTO();
         }
 
-        public async Task<CategoriaDTO> PostCategoria([FromBody] CategoriaDTO categoria)
+        public async Task<CategoriaDTO> PostCategoria([FromBody] mCategoriaDTO categoria)
         {
             if (string.IsNullOrEmpty(categoria.Nombre))
                 throw new Exception("El nombre de la categoría es obligatorio.");
@@ -48,10 +48,11 @@ namespace backend.Infraestructura.Repositorios
             bool existe = await context1.Categoria
                 .AnyAsync(c => c.Nombre == categoria.Nombre && c.Estado == "Activo");
             if (existe) throw new Exception("Ya existe una categoría con ese nombre.");
+            var codigo = CodeGenerator.Generate("CAT");
 
             var cat = new Categoria
             {
-                CodigoCategoria = codigoGenerado,
+                CodigoCategoria = codigo,
                 Nombre = categoria.Nombre
             };
             context1.Categoria.Add(cat);
