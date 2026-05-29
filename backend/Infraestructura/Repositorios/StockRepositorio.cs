@@ -1,3 +1,4 @@
+using backend.Dominio.Helpers;
 using Marketflow.Dominio.DTOs;
 using Marketflow.Dominio.Entidades;
 using Marketflow.Dominio.Interfaces;
@@ -83,7 +84,7 @@ public class StockRepositorio : IStockRepositorio
         var stock = new Stock
         {
             IdProducto = producto.IdProducto,
-            //CodigoLote = CodeGenerator.Generate("STK", 5),
+            CodigoLote = CodeGenerator.Generate("STK"),
             Fecha = DateOnly.FromDateTime(DateTime.Now),
             StockActual = dto.CantidadIngreasada,
             StockInicial = dto.CantidadIngreasada,
