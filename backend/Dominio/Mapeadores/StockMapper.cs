@@ -30,4 +30,6 @@ public static class StockMapper
             Estado = "Activo",
         };
     }
+
+    
 }

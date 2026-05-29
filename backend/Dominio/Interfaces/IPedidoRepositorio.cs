@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.Dominio.DTOs;
 using Microsoft.AspNetCore.Mvc;
+
 namespace backend.Dominio.Interfaces
 {
     public interface IPedidoRepositorio
@@ -17,5 +18,7 @@ namespace backend.Dominio.Interfaces
         Task<PedidoDTO> PostPedido([FromBody] CreatePedidoDTO dto);
         Task<PedidoDTO> PutPedido(string CodigoPedido, [FromBody] UpdatePedidoDTO dto);
         Task<PedidoDTO> DeletePedido(string CodigoPedido);
+
+        Task<List<PedidoRecibidoDTO>> ObtenerPedidosPorVendedor(string codigoVendedor);
     }
 }

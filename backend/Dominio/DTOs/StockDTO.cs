@@ -30,3 +30,9 @@ public class StockSumarioDTO
     public string NombreProducto { get; set; } = string.Empty;
     public int StockTotal { get; set; }
 }
+
+public class StockReposicionDTO
+{
+    public string CodigoProducto { get; set; } = string.Empty;
+    public int CantidadIngreasada { get; set; }
+}

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Dominio.DTOs;
+using backend.Dominio.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using backend.Dominio.Interfaces;
-using backend.Dominio.DTOs;
 
 namespace backend.API.Controllers
 {
@@ -15,6 +15,7 @@ namespace backend.API.Controllers
     public class PedidoController : ControllerBase
     {
         private readonly IPedidoRepositorio context;
+
         public PedidoController(IPedidoRepositorio context)
         {
             this.context = context;
@@ -31,19 +32,22 @@ namespace backend.API.Controllers
         {
             return Ok(await context.GetPedido());
         }
+
         // GET: api/Pedido/5
         [HttpGet("{CodigoPedido}")]
         public async Task<IActionResult> GetPedidoByCodigo(string CodigoPedido)
         {
             return Ok(await context.GetPedidoByCodigo(CodigoPedido));
         }
+
         // POST: api/Pedido
         [HttpPost]
         public async Task<IActionResult> PostPedido(CreatePedidoDTO pedido)
         {
             return Ok(await context.PostPedido(pedido));
         }
-         // PUT: api/Pedido/5
+
+        // PUT: api/Pedido/5
         [HttpPut("{CodigoPedido}")]
         public async Task<IActionResult> PutPedido(string CodigoPedido, UpdatePedidoDTO pedido)
         {
@@ -75,6 +79,19 @@ namespace backend.API.Controllers
         public async Task<IActionResult> DeletePedido(string CodigoPedido)
         {
             return Ok(await context.DeletePedido(CodigoPedido));
+        }
+
+        [HttpGet("recibidos/{codigoVendedor}")]
+        public async Task<IActionResult> GetPedidosRecibidos(string codigoVendedor)
+        {
+            var pedidos = await context.ObtenerPedidosPorVendedor(codigoVendedor);
+
+            if (pedidos == null || !pedidos.Any())
+            {
+                return Ok(new List<PedidoRecibidoDTO>());
+            }
+
+            return Ok(pedidos);
         }
     }
 }

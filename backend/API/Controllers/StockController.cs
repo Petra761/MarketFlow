@@ -85,4 +85,18 @@ public class StockController : ControllerBase
             return NotFound("Lote no encontrado o no se pudo eliminar.");
         return Ok("Lote dado de baja exitosamente.");
     }
+
+    [HttpPost("abastecer")]
+    public async Task<IActionResult> Abastecer([FromBody] StockReposicionDTO dto)
+    {
+        var result = await _context.ReponerProducto(dto);
+        if (result)
+        {
+            return Ok("Se repuso correctamente el producto");
+        }
+        else
+        {
+            return BadRequest("No se pudo reponer el producto");
+        }
+    }
 }

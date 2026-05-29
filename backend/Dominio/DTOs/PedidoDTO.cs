@@ -14,14 +14,15 @@ namespace backend.Dominio.DTOs
         public decimal Total { get; set; }
         public string EstadoPedido { get; set; } = "Pendiente";
     }
+
     public class CreatePedidoDTO
     {
         public string CodigoUsuario { get; set; } = string.Empty;
         public string CodigoMetodoPago { get; set; } = string.Empty;
         public string CodigoPedido { get; set; } = string.Empty;
         public DateOnly Fecha { get; set; }
-        
     }
+
     public class UpdatePedidoDTO
     {
         public string CodigoUsuario { get; set; } = string.Empty;
@@ -29,5 +30,15 @@ namespace backend.Dominio.DTOs
         public string CodigoPedido { get; set; } = string.Empty;
         public DateOnly Fecha { get; set; }
         public string EstadoPedido { get; set; } = "Pendiente";
+    }
+
+    public class PedidoRecibidoDTO
+    {
+        public string CodigoPedido { get; set; } = string.Empty;
+        public string Comprador { get; set; } = string.Empty;
+        public DateOnly Fecha { get; set; }
+        public string EstadoPedido { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+        public List<DetallePedidoRecibidoDTO> Productos { get; set; } = new();
     }
 }
