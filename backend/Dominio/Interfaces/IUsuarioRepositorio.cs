@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Dominio.DTOs;
 using Marketflow.Dominio.Entidades;
 
 namespace backend.Dominio.Interfaces
@@ -13,5 +14,8 @@ namespace backend.Dominio.Interfaces
         Task<Usuario?> CrearUsuario(Usuario usuario);
         Task<bool> ActualizarUsuario(string codigo, Usuario usuario);
         Task<bool> EliminarUsuario(string codigo);
+        Task<Usuario?> IniciarSesion(LoginDTO dto);
+        Task RecuperarCuenta(string correo);
+        Task CambiarContrasenia(CambiarContraseniaDTO dto);
     }
 }

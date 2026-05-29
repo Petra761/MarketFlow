@@ -51,18 +51,105 @@ namespace backend.API.Controllers
         [HttpPost("CrearUsuario")]
         public async Task<IActionResult> CrearUsuario(UsuarioDTO dto)
         {
-            var usuario = UsuarioMapeador.ToEntity(dto);
+             try
+        {
+            var usuario =
+                UsuarioMapeador.ToEntity(dto);
+
             usuario.Estado = "Activo";
 
-            var resultado = await _usuarioRepositorio.CrearUsuario(usuario);
+            var resultado =
+                await _usuarioRepositorio
+                    .CrearUsuario(usuario);
 
-            if (resultado == null)
+            return Ok(new
             {
-                return BadRequest(new {mensaje = "No se logro crear el usuario."});
-            }
-
-            return Ok(resultado);
+                mensaje =
+                    "Usuario creado correctamente"
+            });
         }
+        catch (Exception ex)
+        {
+            return BadRequest(new
+            {
+                mensaje = ex.Message
+            });
+        }
+        }
+
+        //Login
+        [HttpPost("Login")]
+        public async Task<IActionResult>
+            Login(LoginDTO dto)
+        {
+            try
+            {
+                var usuario =
+                    await _usuarioRepositorio
+                        .IniciarSesion(dto);
+
+                return Ok(new
+                {
+                    mensaje = "Login correcto",
+                    rol = usuario?.Rol?.Nombre ?? "",                    
+                    usuario = usuario?.Nombre ?? ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    mensaje = ex.Message
+                });
+            }
+        }
+        //Pedir link de cambiar contrasena
+        [HttpPost("recuperar-cuenta{correo}")]
+        public async Task<IActionResult> RecuperarCuenta( string correo)
+        {
+            try
+            {
+                await _usuarioRepositorio.RecuperarCuenta(
+                    correo
+                );
+
+                return Ok(new
+                {
+                    mensaje = "Correo enviado"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    mensaje = ex.Message
+                });
+            }
+        }
+
+
+
+
+        //Cambiar Contrasenia 
+        [HttpPost("CambiarPassword")]
+        public async Task<IActionResult>
+        CambiarPassword([FromBody] CambiarContraseniaDTO dto)
+        {
+            try
+            {
+                await _usuarioRepositorio
+                    .CambiarContrasenia(dto);
+
+                return Ok(new
+                {mensaje = " Contraseña actualizada correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+
 
         // PUT
         [HttpPut("ActualizarUsuario/{codigo}")]

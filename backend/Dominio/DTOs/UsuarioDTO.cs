@@ -15,4 +15,20 @@ namespace backend.Dominio.DTOs
         public string Correo { get; set; } = string.Empty;
         public string Contrasenia { get; set; } = string.Empty;
     }
+    public class LoginDTO
+    {
+        public string Correo { get; set; } = string.Empty;
+
+        public string Contrasenia { get; set; } = string.Empty;
+    }
+    public class RecuperarCuentaDTO
+    {
+        public string Correo { get; set; } = string.Empty;
+    }
+    public class CambiarContraseniaDTO
+    {
+        public string Correo { get; set; } = string.Empty;
+
+        public string NuevaPassword { get; set; } = string.Empty;
+    }
 }
