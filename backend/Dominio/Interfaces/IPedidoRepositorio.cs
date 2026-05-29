@@ -8,10 +8,14 @@ namespace backend.Dominio.Interfaces
 {
     public interface IPedidoRepositorio
     {
+        Task ConfirmarPedido(string codigoPedido);
+        Task CancelarPedido(string codigoPedido);
+        Task PagarPedido(string codigoPedido);
+        Task<List<PedidoDTO>> GetHistorial(string codigoUsuario);
         Task<List<PedidoDTO>> GetPedido();
         Task<PedidoDTO> GetPedidoByCodigo(string CodigoPedido);
-        Task<PedidoDTO> PostPedido([FromBody] PedidoDTO dto);
-        Task<PedidoDTO> PutPedido(string CodigoPedido, [FromBody] PedidoDTO dto);
+        Task<PedidoDTO> PostPedido([FromBody] CreatePedidoDTO dto);
+        Task<PedidoDTO> PutPedido(string CodigoPedido, [FromBody] UpdatePedidoDTO dto);
         Task<PedidoDTO> DeletePedido(string CodigoPedido);
     }
 }

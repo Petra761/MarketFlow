@@ -16,8 +16,7 @@ namespace backend.Dominio.Mapeadores
             {
                 CodigoPedido = detalle_Pedido.Pedido?.CodigoPedido ?? "N/A",
                 CodigoProducto = detalle_Pedido.Producto?.CodigoProducto ??"N/A",
-                Cantidad = detalle_Pedido.Cantidad,
-                Subtotal = detalle_Pedido.Subtotal
+                Cantidad = detalle_Pedido.Cantidad
             };
         }
     }
