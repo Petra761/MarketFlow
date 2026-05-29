@@ -1,6 +1,4 @@
 using backend.Dominio.Interfaces;
-using backend.Dominio.Interfaces;
-using backend.Infraestructura.Repositorios;
 using backend.Infraestructura.Repositorios;
 using Marketflow.Dominio.Interfaces;
 using Marketflow.Infraestructura.Data;
@@ -10,7 +8,6 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
@@ -42,26 +39,24 @@ builder.Services.AddScoped<IStockRepositorio, StockRepositorio>();
 
 builder.Services.AddScoped<IPrecioRepositorio, PrecioRepositorio>();
 
-builder.Services.AddScoped<IProductoRepositorio, ProductoRepositorio>();
-
-builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
-
-builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
-
-builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
-
 builder.Services.AddScoped<ITelefonoRepositorio, TelefonoRepositorio>();
 
 builder.Services.AddScoped<ITelefono_UsuarioRepositorio, Telefono_UsuarioRepositorio>();
 
 builder.Services.AddScoped<IIntento_LoginRepositorio, Intento_LoginRepositorio>();
 
+builder.Services.AddScoped<IProductoRepositorio, ProductoRepositorio>();
+
+builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
+
+builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+
+
+
 var app = builder.Build();
 
-// Swagger + Scalar
 if (app.Environment.IsDevelopment())
 {
-    // OpenAPI
     app.MapOpenApi();
 
     app.UseSwagger();

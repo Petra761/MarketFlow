@@ -7,8 +7,8 @@ namespace backend.Dominio.DTOs
 {
     public class CategoriaDTO
     {
-        public string CodigoCategoria { get; set;}
-        public string Nombre { get; set; }
+        public string? CodigoCategoria { get; set; }
+        public string Nombre { get; set; } = string.Empty;
      
     }
 }

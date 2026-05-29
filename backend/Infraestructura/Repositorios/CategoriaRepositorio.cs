@@ -9,93 +9,88 @@ using Marketflow.Dominio.Entidades;
 using Marketflow.Infraestructura.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using backend.Dominio.Helpers;
 
 namespace backend.Infraestructura.Repositorios
 {
     public class CategoriaRepositorio : ICategoriaRepositorio
     {
         private readonly MarketflowContext context1;
-         public CategoriaRepositorio(MarketflowContext context)
+        public CategoriaRepositorio(MarketflowContext context)
         {
             this.context1 = context;
-        } 
-        public async Task<List<CategoriaDTO>>GetCategorias()
-        {
-            var categoria = await context1.Categoria
-             .Where(c =>c.Estado == "Activo")
-             .ToListAsync();
-
-             return categoria.Select(p => p.toCategoriaDTO()).ToList();
         }
 
-        public async Task<CategoriaDTO>GetCategoria(string codigo)
+        public async Task<List<CategoriaDTO>> GetCategorias()
         {
-            var categoria = await context1.Categoria
-                .FirstOrDefaultAsync(c => c.CodigoCategoria == codigo 
-                && c.Estado == "Activo");
-
-                if(categoria == null) throw new Exception("El producto no existe");
-                return categoria.toCategoriaDTO();
+            var categorias = await context1.Categoria
+                .Where(c => c.Estado == "Activo")
+                .ToListAsync();
+            return categorias.Select(c => c.toCategoriaDTO()).ToList();
         }
 
+        public async Task<CategoriaDTO> GetCategoria(string codigo)
+        {
+            var categoria = await context1.Categoria
+                .FirstOrDefaultAsync(c => c.CodigoCategoria == codigo && c.Estado == "Activo");
+
+            if (categoria == null) throw new Exception("La categoría no existe.");
+            return categoria.toCategoriaDTO();
+        }
 
         public async Task<CategoriaDTO> PostCategoria([FromBody] CategoriaDTO categoria)
         {
-            var comprobante = await context1.Categoria
-                .AnyAsync(c => c.CodigoCategoria == categoria.CodigoCategoria
-                && c.Estado == "Activo");
-                if(comprobante) throw new Exception("La categoria ya existe");
+            if (string.IsNullOrEmpty(categoria.Nombre))
+                throw new Exception("El nombre de la categoría es obligatorio.");
 
-        
+            string codigoGenerado = CodeGenerator.Generate("CAT");
+
+            bool existe = await context1.Categoria
+                .AnyAsync(c => c.Nombre == categoria.Nombre && c.Estado == "Activo");
+            if (existe) throw new Exception("Ya existe una categoría con ese nombre.");
+
             var cat = new Categoria
             {
-                CodigoCategoria = categoria.CodigoCategoria,
-                Nombre =  categoria.Nombre
-                
+                CodigoCategoria = codigoGenerado,
+                Nombre = categoria.Nombre
             };
             context1.Categoria.Add(cat);
             await context1.SaveChangesAsync();
-            
-            return cat.toCategoriaDTO();
 
+            return cat.toCategoriaDTO();
         }
 
-
-        public async Task<CategoriaDTO>PutCategoria(string codigo, [FromBody] CategoriaDTO categoria)
+        public async Task<CategoriaDTO> PutCategoria(string codigo, [FromBody] CategoriaDTO categoria)
         {
+            if (string.IsNullOrEmpty(categoria.Nombre))
+                throw new Exception("El nombre de la categoría es obligatorio.");
+
             var cat = await context1.Categoria
-                .FirstOrDefaultAsync(c =>
-                c.CodigoCategoria == codigo &&
-                c.Estado == "Activo" );
-            
-            if(cat == null) throw new Exception("La categoria no existe");
-    
+                .FirstOrDefaultAsync(c => c.CodigoCategoria == codigo && c.Estado == "Activo");
+            if (cat == null) throw new Exception("La categoría no existe.");
 
-            cat.CodigoCategoria = categoria.CodigoCategoria;
             cat.Nombre = categoria.Nombre;
-
             context1.Categoria.Update(cat);
             await context1.SaveChangesAsync();
-            
+
             return cat.toCategoriaDTO();
-        }            
+        }
 
+        public async Task<CategoriaDTO> DeleteCategoria(string codigo)
+        {
+            var cat = await context1.Categoria
+                .FirstOrDefaultAsync(c => c.CodigoCategoria == codigo && c.Estado == "Activo");
+            if (cat == null) throw new Exception("La categoría no existe.");
 
-            public async Task<CategoriaDTO>DeleteCategoria(string codigo)
-            {
-                var cat = await context1.Categoria
-                    .FirstOrDefaultAsync(p =>
-                    p.CodigoCategoria == codigo &&
-                    p.Estado == "Activo");
-                    
-                    if(cat == null) throw new Exception("Este producto ya existe");
+            bool tieneProductos = await context1.Producto
+                .AnyAsync(p => p.IdCategoria == cat.IdCategoria && p.Estado == "Activo");
+            if (tieneProductos)
+                throw new Exception("No puedes eliminar esta categoría porque tiene productos activos asociados.");
 
-                    cat.Estado = "Inactivo";
-                    context1.Categoria.Update(cat);
-                    await context1.SaveChangesAsync();
-                    return cat.toCategoriaDTO();
-
-            }
-
+            cat.Estado = "Inactivo";
+            context1.Categoria.Update(cat);
+            await context1.SaveChangesAsync();
+            return cat.toCategoriaDTO();
+        }
     }
 }
