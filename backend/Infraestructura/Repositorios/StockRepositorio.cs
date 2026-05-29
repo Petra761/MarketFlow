@@ -171,5 +171,35 @@ public class StockRepositorio : IStockRepositorio
         {
             return $"error {ex}";
         }
-    }
+        }
+        public async Task<bool> DevolverStock(string codigoPedido)
+        {
+            var pedido = await _context.Pedido
+                .FirstOrDefaultAsync(p => p.CodigoPedido == codigoPedido);
+
+            if (pedido == null)
+                return false;
+
+            var detalles = await _context.Detalle_Pedido
+                .Where(d => d.IdPedido == pedido.IdPedido)
+                .ToListAsync();
+
+            foreach (var item in detalles)
+            {
+                var lote = await _context.Stock
+                    .Where(s => s.IdProducto == item.IdProducto)
+                    .OrderByDescending(s => s.Fecha)
+                    .FirstOrDefaultAsync();
+
+                if (lote != null)
+                {
+                    lote.StockActual += item.Cantidad;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
 }
+

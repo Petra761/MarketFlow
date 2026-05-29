@@ -16,4 +16,5 @@ public interface IStockRepositorio
     Task<bool> ReponerProducto(StockReposicionDTO dto);
     Task<bool> HayStock(string codigoproducto, int cantidad);
     Task<string> ActualizarStock(string CodigoPedido);
+    Task<bool> DevolverStock(string codigoPedido);
 }

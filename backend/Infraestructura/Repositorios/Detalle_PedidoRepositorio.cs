@@ -9,15 +9,18 @@ using Microsoft.EntityFrameworkCore;
 using Marketflow.Infraestructura.Data;
 using Marketflow.Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
+using Marketflow.Dominio.Interfaces;
 
 namespace backend.Infraestructura.Repositorios
 {
     public class Detalle_PedidoRepositorio : IDetalle_PedidoRepositorio
     {
         public readonly MarketflowContext _context;
-        public Detalle_PedidoRepositorio(MarketflowContext context)
+        private readonly IStockRepositorio _stockRepositorio;
+        public Detalle_PedidoRepositorio(MarketflowContext context, IStockRepositorio stockRepositorio)
         {
             this._context = context;
+            _stockRepositorio = stockRepositorio;
         }
         private async Task ActualizarTotalPedido(int idPedido)
         {
@@ -88,13 +91,21 @@ namespace backend.Infraestructura.Repositorios
             {
                 throw new Exception("No hay un precio activo para el producto");
             }
-            var subtotal = precio.Monto * dto.Cantidad;
-
-            // ANTES de guardar cantidad nueva
-            // var hayStock = await HayStock(dto.CodigoProducto, dto.Cantidad);
-            // if (!hayStock) throw new Exception("Sin stock");
+                
             if (dto.Cantidad <= 0)
                 throw new Exception("La cantidad debe ser mayor a 0");
+
+
+            var hayStock = await _stockRepositorio.HayStock(
+                dto.CodigoProducto,
+                dto.Cantidad
+            );
+
+            if (!hayStock)
+                throw new Exception("Stock insuficiente");
+                
+            var subtotal = precio.Monto * dto.Cantidad;
+
             var detalle_pedido = new Detalle_Pedido
             {
                 IdPedido = Pedido.IdPedido,
@@ -149,11 +160,20 @@ namespace backend.Infraestructura.Repositorios
                 throw new Exception("No hay un precio activo para el producto");
             if (dto.Cantidad <= 0)
                 throw new Exception("La cantidad debe ser mayor a 0");
-            var subtotal = precio.Monto * dto.Cantidad;
-            // ANTES de guardar cantidad nueva
-            // var hayStock = await HayStock(dto.CodigoProducto, dto.Cantidad);
-            // if (!hayStock) throw new Exception("Sin stock");
+            var cantidadExtra = dto.Cantidad - detalle_pedido.Cantidad;
 
+            if (cantidadExtra > 0)
+            {
+                var hayStock = await _stockRepositorio.HayStock(
+                    dto.CodigoProducto,
+                    cantidadExtra
+                );
+
+                if (!hayStock)
+                    throw new Exception("Stock insuficiente");
+            }
+
+            var subtotal = precio.Monto * dto.Cantidad;
             detalle_pedido.Cantidad = dto.Cantidad;
             detalle_pedido.Subtotal = subtotal;
             
@@ -185,6 +205,8 @@ namespace backend.Infraestructura.Repositorios
             {
                 throw new Exception("El detalle del pedido no existe");
             }
+            if(detalle_pedido.Pedido.EstadoPedido != "Pendiente")
+                throw new Exception("Solo pedidos pendientes pueden modificarse");
             _context.Detalle_Pedido.Remove(detalle_pedido);
             await _context.SaveChangesAsync();
             await ActualizarTotalPedido(detalle_pedido.IdPedido);

@@ -10,16 +10,20 @@ using Marketflow.Dominio.Entidades;
 using Marketflow.Infraestructura.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Marketflow.Dominio.Interfaces;
+using backend.Dominio.Helpers;
 
 namespace backend.Infraestructura.Repositorios
 {
     public class PedidoRepositorio : IPedidoRepositorio
     {
         private readonly MarketflowContext _context;
+        private readonly IStockRepositorio _stockRepositorio;
 
-        public PedidoRepositorio(MarketflowContext context)
+        public PedidoRepositorio(MarketflowContext context, IStockRepositorio stockRepositorio)
         {
             this._context = context;
+            this._stockRepositorio = stockRepositorio;
         }
         public async Task ConfirmarPedido(string codigoPedido)
         {
@@ -37,18 +41,28 @@ namespace backend.Infraestructura.Repositorios
 
             if (!tieneDetalles)
                 throw new Exception("No puedes confirmar un pedido sin productos");
-            // =========================
-            // STOCK (COMENTADO)
-            // =========================
-            /*
+                        var detalles = await _context.Detalle_Pedido
+                .Include(d => d.Producto)
+                .Where(d => d.IdPedido == pedido.IdPedido)
+                .ToListAsync();
+
             foreach (var item in detalles)
             {
-                if (!await HayStock(item.IdProducto, item.Cantidad))
-                    throw new Exception("Stock insuficiente");
+                var hayStock = await _stockRepositorio.HayStock(
+                    item.Producto.CodigoProducto,
+                    item.Cantidad
+                );
 
-                await ActualizarStock(item.IdProducto, item.Cantidad);
+                if (!hayStock)
+                    throw new Exception(
+                        $"Stock insuficiente para el producto {item.Producto.Nombre}"
+                    );
             }
-            */
+
+            var resultado = await _stockRepositorio.ActualizarStock(codigoPedido);
+
+            if (resultado != "Se Actualizo el stock correctamente")
+                throw new Exception(resultado);
             pedido.EstadoPedido = "Confirmado";
 
             await _context.SaveChangesAsync();
@@ -63,22 +77,15 @@ namespace backend.Infraestructura.Repositorios
 
             if (pedido.EstadoPedido == "Pagado")
                 throw new Exception("No se puede cancelar un pedido pagado");
-            // =========================
-            // STOCK (COMENTADO)
-            // =========================
-            /*
+
             if (pedido.EstadoPedido == "Confirmado")
             {
-                var detalles = await _context.Detalle_Pedido
-                    .Where(d => d.IdPedido == pedido.IdPedido)
-                    .ToListAsync();
+                var resultado = await _stockRepositorio.DevolverStock(codigoPedido);
 
-                foreach (var item in detalles)
-                {
-                    await RevertirStock(item.IdProducto, item.Cantidad);
-                }
+                if (!resultado)
+                    throw new Exception("No se pudo devolver el stock");
             }
-            */
+
             pedido.EstadoPedido = "Cancelado";
 
             await _context.SaveChangesAsync();
@@ -137,18 +144,10 @@ namespace backend.Infraestructura.Repositorios
         }
         public async Task<PedidoDTO> PostPedido([FromBody] CreatePedidoDTO dto)
         {
-            if (
-                await _context.Pedido.AnyAsync(p =>
-                    p.CodigoPedido == dto.CodigoPedido && p.Estado == "Activo"
-                )
-            )
-            {
-                throw new Exception("El pedido ya existe");
+            var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
+            if(Usuario == null)            {
+               throw new Exception("El usuario no existe");
             }
-            // var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
-            // if(Usuario == null)            {
-            //     throw new Exception("El usuario no existe");
-            // }
             var MetodoPago = await _context.Metodo_Pago.FirstOrDefaultAsync(m =>
                 m.CodigoMetodoPago == dto.CodigoMetodoPago && m.Estado == "Activo"
             );
@@ -158,9 +157,9 @@ namespace backend.Infraestructura.Repositorios
             }
             var pedido = new Pedido
             {
-                IdUsuario = 2,
+                IdUsuario = Usuario.IdUsuario,
                 IdMetodoPago = MetodoPago.IdMetodoPago,
-                CodigoPedido = dto.CodigoPedido,
+                CodigoPedido = CodeGenerator.Generate("PED"),
                 Fecha = dto.Fecha,
                 Total = 0,
                 EstadoPedido = "Pendiente"
