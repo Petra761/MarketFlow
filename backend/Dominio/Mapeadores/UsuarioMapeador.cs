@@ -40,7 +40,6 @@ namespace backend.Dominio.Mapeadores
         {
             return new UsuarioGetDTO
             {
-                CodigoUsuario = usuario.CodigoUsuario,
                 Rol = usuario.Rol!.Nombre,
                 Nombre = usuario.Nombre,
                 Apellido = usuario.Apellido,
@@ -61,7 +60,16 @@ namespace backend.Dominio.Mapeadores
             };
         }
 
-
+        public static UsuarioPefirlDTO ToPerfilDTO(Usuario usuario)
+        {
+            return new UsuarioPefirlDTO
+            {
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                Nickname = usuario.Nickname,
+                Correo = usuario.Correo
+            };
+        }
         public static List<UsuarioDTO> ToDTOList(List<Usuario> usuarios)
         {
             return usuarios.Select(u => ToDTO(u)).ToList();
