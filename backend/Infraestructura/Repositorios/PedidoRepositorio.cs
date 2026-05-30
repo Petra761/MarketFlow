@@ -64,7 +64,7 @@ namespace backend.Infraestructura.Repositorios
 
             var resultado = await _stockRepositorio.ActualizarStock(codigoPedido);
 
-            if (resultado != "Se Actualizo el stock correctamente")
+            if (resultado != "Se Actualizo el stock correctamente" && resultado != "OK")
                 throw new Exception(resultado);
             pedido.EstadoPedido = "Confirmado";
 

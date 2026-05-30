@@ -26,6 +26,14 @@ namespace backend.API.Controllers
             return Ok(await context1.GetProductos());
         }
 
+        [HttpGet("productos-disponibles")]
+        public async Task<IActionResult> ObtenerProductosDisponibles()
+        {
+            var resultado = await context1.ObtenerProductosDisponibles();
+
+            return Ok(resultado);
+        }
+
         [HttpGet("{codigo}")]
         public async Task<IActionResult> GetProducto(string codigo)
         {

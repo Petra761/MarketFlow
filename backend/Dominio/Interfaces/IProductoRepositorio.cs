@@ -16,7 +16,7 @@ namespace backend.Dominio.Interfaces
         Task<ProductoDTO> PutProducto(string codigo, string codigoUsuario, [FromBody] ProductoDTO producto);
         Task<ProductoDTO> DeleteProducto(string codigo, string codigoUsuario);
         Task<List<MisProductosDTO>> GetMisProductos(string codigoUsuario);
-
+        Task<List<ProductoDisponibleDTO>> ObtenerProductosDisponibles();
         Task<List<ProductoStock>> GetBajoStock(string Codigousuario, int cantidad);
         Task<string> ActualizarPrecio(ActualizarPrecioDTO dto);
     }
