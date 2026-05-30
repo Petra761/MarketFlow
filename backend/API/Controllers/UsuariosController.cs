@@ -69,7 +69,7 @@ namespace backend.API.Controllers
                 Contrasenia = dto.Contrasenia
             };
 
-            await _usuarioRepositorio.CrearUsuario(usuario);
+            await _usuarioRepositorio.CrearUsuario(dto);
 
             return Ok(new
             {

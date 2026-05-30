@@ -13,6 +13,7 @@ namespace backend.Dominio.DTOs
         public string Nickname { get; set; } = string.Empty;
         public string Correo { get; set; } = string.Empty;
         public string Contrasenia { get; set; } = string.Empty;
+        public string Numero { get; set; } = string.Empty;
     }
     public class LoginDTO
     {

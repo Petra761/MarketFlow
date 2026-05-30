@@ -41,28 +41,27 @@ namespace backend.Infraestructura.Repositorios
                 .FirstOrDefaultAsync(u => u.CodigoUsuario == codigo);
         }
 
-        public async Task<Usuario?>CrearUsuario(Usuario usuario)
+       public async Task<Usuario?> CrearUsuario(UsuarioDTO dto)
         {
             if (
-                string.IsNullOrWhiteSpace(usuario.Nombre) ||
-                string.IsNullOrWhiteSpace(usuario.Correo) ||
-                string.IsNullOrWhiteSpace(usuario.Contrasenia)
+                string.IsNullOrWhiteSpace(dto.Nombre) ||
+                string.IsNullOrWhiteSpace(dto.Correo) ||
+                string.IsNullOrWhiteSpace(dto.Contrasenia)
             )
             {
-                throw new Exception(
-                    "Todos los campos son obligatorios"
-                );
+                throw new Exception("Todos los campos son obligatorios");
             }
 
-            if (usuario.Contrasenia.Length < 8)
+            if (dto.Contrasenia.Length < 8)
             {
                 throw new Exception(
                     "La contraseña debe tener mínimo 8 caracteres"
                 );
             }
+
             bool emailValido = Regex.IsMatch(
-            usuario.Correo,
-            @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                dto.Correo,
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
             );
 
             if (!emailValido)
@@ -73,7 +72,7 @@ namespace backend.Infraestructura.Repositorios
             }
 
             bool existe = await _context.Usuario
-                .AnyAsync(u => u.Correo == usuario.Correo);
+                .AnyAsync(u => u.Correo == dto.Correo);
 
             if (existe)
             {
@@ -82,16 +81,53 @@ namespace backend.Infraestructura.Repositorios
                 );
             }
 
-            usuario.Contrasenia =
-                BCrypt.Net.BCrypt.HashPassword(
-                    usuario.Contrasenia);
+            var rol = await _context.Rol
+                .FirstOrDefaultAsync(r =>
+                    r.CodigoRol == dto.CodigoRol &&
+                    r.Estado == "Activo");
 
-            usuario.CodigoUsuario = CodeGenerator.Generate("U");
+            if (rol == null)
+            {
+                throw new Exception("Rol no encontrado");
+            }
 
-            _context.Usuario.Add(usuario);
+            var nuevoUsuario = new Usuario
+            {
+                IdRol = rol.IdRol,
+                CodigoUsuario = CodeGenerator.Generate("U"),
+                Nombre = dto.Nombre,
+                Apellido = dto.Apellido,
+                Nickname = dto.Nickname,
+                Correo = dto.Correo,
+                Contrasenia = BCrypt.Net.BCrypt.HashPassword(dto.Contrasenia),
+                FechaRegistro = DateOnly.FromDateTime(DateTime.Now),
+                Estado = "Activo"
+            };
+
+            _context.Usuario.Add(nuevoUsuario);
             await _context.SaveChangesAsync();
 
-            return usuario;
+            var telefono = new Telefono
+            {
+                CodigoTelefono = CodeGenerator.Generate("TEL"),
+                Numero = dto.Numero,
+                Estado = "Activo"
+            };
+
+            _context.Telefono.Add(telefono);
+            await _context.SaveChangesAsync();
+
+            var telefonoUsuario = new Telefono_Usuario
+            {
+                IdTelefono = telefono.IdTelefono,
+                IdUsuario = nuevoUsuario.IdUsuario,
+                FechaInicio = DateOnly.FromDateTime(DateTime.Now)
+            };
+
+            _context.Telefono_Usuario.Add(telefonoUsuario);
+            await _context.SaveChangesAsync();
+
+            return nuevoUsuario;
         }
 
         public async Task<bool> ActualizarUsuario(string codigo, Usuario usuario)
