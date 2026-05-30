@@ -48,12 +48,6 @@ public class StockRepositorio : IStockRepositorio
         return producto?.IdProducto ?? 0;
     }
 
-    public async Task<bool> CrearStockAsync(Stock stock)
-    {
-        await _context.Stock.AddAsync(stock);
-        return await _context.SaveChangesAsync() > 0;
-    }
-
     public async Task<bool> ActualizarStockAsync(Stock stock)
     {
         _context.Entry(stock).State = EntityState.Modified;
@@ -84,7 +78,7 @@ public class StockRepositorio : IStockRepositorio
         var stock = new Stock
         {
             IdProducto = producto.IdProducto,
-            CodigoLote = CodeGenerator.Generate("STK"),
+            CodigoLote = CodeGenerator.Generate("LOT"),
             Fecha = DateOnly.FromDateTime(DateTime.Now),
             StockActual = dto.CantidadIngreasada,
             StockInicial = dto.CantidadIngreasada,
@@ -171,35 +165,34 @@ public class StockRepositorio : IStockRepositorio
         {
             return $"error {ex}";
         }
-        }
-        public async Task<bool> DevolverStock(string codigoPedido)
+    }
+
+    public async Task<bool> DevolverStock(string codigoPedido)
+    {
+        var pedido = await _context.Pedido.FirstOrDefaultAsync(p => p.CodigoPedido == codigoPedido);
+
+        if (pedido == null)
+            return false;
+
+        var detalles = await _context
+            .Detalle_Pedido.Where(d => d.IdPedido == pedido.IdPedido)
+            .ToListAsync();
+
+        foreach (var item in detalles)
         {
-            var pedido = await _context.Pedido
-                .FirstOrDefaultAsync(p => p.CodigoPedido == codigoPedido);
+            var lote = await _context
+                .Stock.Where(s => s.IdProducto == item.IdProducto)
+                .OrderByDescending(s => s.Fecha)
+                .FirstOrDefaultAsync();
 
-            if (pedido == null)
-                return false;
-
-            var detalles = await _context.Detalle_Pedido
-                .Where(d => d.IdPedido == pedido.IdPedido)
-                .ToListAsync();
-
-            foreach (var item in detalles)
+            if (lote != null)
             {
-                var lote = await _context.Stock
-                    .Where(s => s.IdProducto == item.IdProducto)
-                    .OrderByDescending(s => s.Fecha)
-                    .FirstOrDefaultAsync();
-
-                if (lote != null)
-                {
-                    lote.StockActual += item.Cantidad;
-                }
+                lote.StockActual += item.Cantidad;
             }
-
-            await _context.SaveChangesAsync();
-
-            return true;
         }
-}
 
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+}

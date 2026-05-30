@@ -1,3 +1,4 @@
+using backend.Dominio.Helpers;
 using Marketflow.Dominio.DTOs;
 using Marketflow.Dominio.Entidades;
 
@@ -23,13 +24,11 @@ public static class StockMapper
         return new Stock
         {
             IdProducto = idProducto,
-            CodigoLote = dto.CodigoLote,
-            Fecha = dto.Fecha,
+            CodigoLote = CodeGenerator.Generate("LOT"),
+            Fecha = DateOnly.FromDateTime(DateTime.Now),
             StockInicial = dto.Cantidad,
             StockActual = dto.Cantidad,
             Estado = "Activo",
         };
     }
-
-    
 }

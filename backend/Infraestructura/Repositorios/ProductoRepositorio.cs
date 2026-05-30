@@ -7,7 +7,9 @@ using backend.Dominio.Helpers;
 using backend.Dominio.Interfaces;
 using backend.Dominio.Mapeadores;
 using backend.Infraestructura;
+using Marketflow.Dominio.DTOs;
 using Marketflow.Dominio.Entidades;
+using Marketflow.Dominio.Interfaces;
 using Marketflow.Infraestructura.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +19,18 @@ namespace Marketflow.Infraestructura.Repositorios
     public class ProductoRepositorio : IProductoRepositorio
     {
         private readonly MarketflowContext context1;
+        private readonly IStockRepositorio context2;
+        private readonly IPrecioRepositorio context3;
 
-        public ProductoRepositorio(MarketflowContext context)
+        public ProductoRepositorio(
+            MarketflowContext context,
+            IStockRepositorio stockrepo,
+            IPrecioRepositorio preciorepo
+        )
         {
             this.context1 = context;
+            this.context2 = stockrepo;
+            this.context3 = preciorepo;
         }
 
         public async Task<List<ProductoDTO>> GetProductos()
@@ -114,7 +124,20 @@ namespace Marketflow.Infraestructura.Repositorios
                 EstadoProducto = "Nuevo",
             };
             context1.Producto.Add(product);
+
             await context1.SaveChangesAsync();
+
+            if (producto.CantidadInicial != null)
+            {
+                var stock = new StockReposicionDTO
+                {
+                    CodigoProducto = codigoGenerado,
+                    CantidadIngreasada = producto.CantidadInicial ?? 0,
+                };
+
+                await context2.ReponerProducto(stock);
+            }
+            await context3.CrearPrecioAsync(producto.Precio, product.IdProducto);
 
             return product.toProductoDTO();
         }
@@ -221,6 +244,58 @@ namespace Marketflow.Infraestructura.Repositorios
             ).ToListAsync();
 
             return productosBajoStock;
+        }
+
+        public async Task<string> ActualizarPrecio(ActualizarPrecioDTO dto)
+        {
+            using var transaction = await context1.Database.BeginTransactionAsync();
+
+            try
+            {
+                var productoId = await (
+                    from p in context1.Producto
+                    where p.CodigoProducto == dto.CodigoProducto
+                    select p.IdProducto
+                ).FirstOrDefaultAsync();
+
+                if (productoId == 0)
+                    return "Error: Producto no encontrado.";
+
+                var precioActual = await (
+                    from pr in context1.Precio
+                    where pr.IdProducto == productoId && pr.Estado == "Activo"
+                    select pr
+                ).FirstOrDefaultAsync();
+
+                if (precioActual != null)
+                {
+                    precioActual.Estado = "Inactivo";
+                    precioActual.FechaFin = DateOnly.FromDateTime(DateTime.Now);
+                    context1.Precio.Update(precioActual);
+                }
+
+                var nuevoPrecio = new Precio
+                {
+                    IdProducto = productoId,
+                    CodigoPrecio = CodeGenerator.Generate("PRE"),
+                    Monto = dto.NuevoMonto,
+                    FechaInicio = DateOnly.FromDateTime(DateTime.Now),
+                    FechaFin = null,
+                    Estado = "Activo",
+                };
+
+                await context1.Precio.AddAsync(nuevoPrecio);
+
+                await context1.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return "OK";
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return $"Error al actualizar el precio: {ex.Message}";
+            }
         }
     }
 }

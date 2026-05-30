@@ -1,3 +1,4 @@
+using backend.Dominio.Helpers;
 using Marketflow.Dominio.DTOs;
 using Marketflow.Dominio.Entidades;
 
@@ -24,9 +25,9 @@ public static class PrecioMapper
         return new Precio
         {
             IdProducto = idProducto,
-            CodigoPrecio = dto.CodigoPrecio,
+            CodigoPrecio = CodeGenerator.Generate("PRE"),
             Monto = dto.Monto,
-            FechaInicio = dto.FechaInicio,
+            FechaInicio = DateOnly.FromDateTime(DateTime.Now),
             Estado = "Activo",
         };
     }

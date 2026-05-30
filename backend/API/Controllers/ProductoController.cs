@@ -70,5 +70,19 @@ namespace backend.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpPatch("actualizar-precio")]
+        public async Task<IActionResult> UpdateMonto([FromBody] ActualizarPrecioDTO dto)
+        {
+            var resultado = await context1.ActualizarPrecio(dto);
+
+            if (resultado == "OK")
+                return Ok(new { mensaje = "Precio actualizado exitosamente" });
+
+            if (resultado.Contains("no encontrado"))
+                return NotFound(resultado);
+
+            return BadRequest(resultado);
+        }
     }
 }

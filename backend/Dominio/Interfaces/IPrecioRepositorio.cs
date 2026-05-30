@@ -8,7 +8,8 @@ public interface IPrecioRepositorio
     Task<Precio?> ObtenerPorCodigoPrecioAsync(string codigoPrecio);
     Task<Precio?> ObtenerPrecioPorMontoYProductoAsync(int idProducto, decimal monto);
     Task<IEnumerable<Precio>> ObtenerHistorialPorProductoAsync(string codigoProducto);
-    Task<bool> CrearPrecioAsync(Precio precio);
+
+    Task<bool> CrearPrecioAsync(int precio, int idProducto);
     Task<bool> ActualizarPrecioAsync(Precio precio);
     Task<bool> DesactivarPreciosRestantesAsync(int idProducto, string codigoPrecioExcluido);
     Task<int> ObtenerIdProductoPorCodigo(string codigoProducto);

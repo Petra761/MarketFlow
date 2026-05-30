@@ -48,20 +48,20 @@ public class StockController : ControllerBase
         return Ok(sumario);
     }
 
-    [HttpPost]
-    public async Task<ActionResult> Post([FromBody] StockCreateDTO dto)
-    {
-        int idProducto = await _context.ObtenerIdProductoPorCodigo(dto.CodigoProducto);
-        if (idProducto == 0)
-            return BadRequest("El producto especificado no existe.");
+    // [HttpPost]
+    // public async Task<ActionResult> Post([FromBody] StockCreateDTO dto)
+    // {
+    //     int idProducto = await _context.ObtenerIdProductoPorCodigo(dto.CodigoProducto);
+    //     if (idProducto == 0)
+    //         return BadRequest("El producto especificado no existe.");
 
-        var entidad = StockMapper.ToEntity(dto, idProducto);
-        var result = await _context.CrearStockAsync(entidad);
+    //     var entidad = StockMapper.ToEntity(dto, idProducto);
+    //     var result = await _context.CrearStockAsync(entidad);
 
-        if (!result)
-            return BadRequest("No se pudo registrar el stock.");
-        return Ok("Nuevo lote registrado exitosamente.");
-    }
+    //     if (!result)
+    //         return BadRequest("No se pudo registrar el stock.");
+    //     return Ok("Nuevo lote registrado exitosamente.");
+    // }
 
     [HttpPut("{codigoLote}")]
     public async Task<ActionResult> Put(string codigoLote, [FromBody] StockUpdateDTO dto)
