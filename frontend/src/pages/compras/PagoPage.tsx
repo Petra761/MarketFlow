@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useMetodosPago } from "../../hooks/useMetodosPago";
 import { useCarritoActivo } from "../../hooks/useCarritoActivo";
 import { pedidoService } from "../../services/pedidoService";
+import { getStoredUser } from "../../services/authStorage";
 import OrderSummary from "../../components/compras/OrderSummary";
 import PaymentMethodSelector from "../../components/compras/PaymentMethodSelector";
 import CardPaymentForm from "../../components/compras/CardPaymentForm";
@@ -55,10 +56,17 @@ export default function PagoPage() {
     setErrorPago(null);
 
     try {
+      const usuario = getStoredUser();
+      if (!usuario?.codigoUsuario) {
+        setErrorPago("Error: Sesión no válida.");
+        setLoading(false);
+        return;
+      }
+
       // 1. Actualizar el pedido con el método de pago seleccionado
       const today = new Date().toISOString().split("T")[0];
       await pedidoService.update(codigoPedido, {
-        codigoUsuario: "U1",
+        codigoUsuario: usuario.codigoUsuario,
         codigoMetodoPago: selectedMethod,
         codigoPedido: codigoPedido,
         fecha: today,

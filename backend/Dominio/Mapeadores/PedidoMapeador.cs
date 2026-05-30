@@ -24,7 +24,14 @@ namespace backend.Dominio.Mapeadores
 
                 Total = pedido.Total,
 
-                EstadoPedido = pedido.EstadoPedido
+                EstadoPedido = pedido.EstadoPedido,
+
+                Productos = pedido.DetallesPedido?.Select(d => new DetallePedidoRecibidoDTO
+                {
+                    NombreProducto = d.Producto?.Nombre ?? "Producto Desconocido",
+                    Cantidad = d.Cantidad,
+                    Subtotal = d.Subtotal
+                }).ToList() ?? new List<DetallePedidoRecibidoDTO>()
             };
         }
     }

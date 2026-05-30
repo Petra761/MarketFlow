@@ -7,6 +7,8 @@ import {
 import CarritoPage from "./pages/compras/CarritoPage";
 import PagoPage from "./pages/compras/PagoPage";
 import ProductosPruebaPage from "./pages/compras/ProductosPruebaPage";
+import HistorialComprasPage from "./pages/compras/HistorialComprasPage";
+import DetallePedidoPage from "./pages/compras/DetallePedidoPage";
 import { BrowserRouter, Routes, Route, Link, NavLink, Outlet } from "react-router-dom";
 import { ReportesPage } from "./pages/admin/ReportesPage";
 
@@ -51,7 +53,7 @@ const BuyerLayout = () => (
       </Link>
       <div className="space-x-6 text-gray-600">
         <Link to="/carrito">Carrito</Link>
-        <Link to="/mis-pedidos text-sm">Mis Compras</Link>
+        <Link to="/mis-pedidos">Mis Compras</Link>
         <Link to="/perfil" className="font-medium">
           Mi Perfil
         </Link>
@@ -92,10 +94,9 @@ const SellerLayout = () => (
 // Layout Admin (Diferenciado por color)
 const AdminLayout = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${
-      isActive
-        ? "bg-[#2be1a4] text-[#0b333b] shadow-md shadow-[#2be1a4]/10"
-        : "text-teal-100 hover:bg-[#154650] hover:text-white"
+    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${isActive
+      ? "bg-[#2be1a4] text-[#0b333b] shadow-md shadow-[#2be1a4]/10"
+      : "text-teal-100 hover:bg-[#154650] hover:text-white"
     }`;
 
   return (
@@ -196,17 +197,17 @@ function App() {
 
         {/* 1. RUTAS PÚBLICAS */}
         <Route element={<PublicLayout />}>
-        <Route path="/" element={<EnEspera titulo="Home / Landing Page" />} />
+          <Route path="/" element={<EnEspera titulo="Home / Landing Page" />} />
 
-        <Route
-          path="/iniciar-sesion"
-          element={<EnEspera titulo="Inicio de Sesión" />}
-        />
+          <Route
+            path="/iniciar-sesion"
+            element={<EnEspera titulo="Inicio de Sesión" />}
+          />
 
-        <Route
-          path="/registro"
-          element={<EnEspera titulo="Registro de Usuario" />}
-        />
+          <Route
+            path="/registro"
+            element={<EnEspera titulo="Registro de Usuario" />}
+          />
           <Route path="/catalogo" element={<ProductosPruebaPage />} />
           <Route
             path="/producto/:codigo"
@@ -220,11 +221,11 @@ function App() {
           <Route path="/pago" element={<PagoPage />} />
           <Route
             path="/mis-pedidos"
-            element={<EnEspera titulo="Historial de Pedidos" />}
+            element={<HistorialComprasPage />}
           />
           <Route
             path="/mis-pedidos/:codigo"
-            element={<EnEspera titulo="Seguimiento de Pedido" />}
+            element={<DetallePedidoPage />}
           />
           <Route
             path="/perfil"

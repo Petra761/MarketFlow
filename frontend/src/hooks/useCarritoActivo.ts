@@ -15,10 +15,10 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { pedidoService } from "../services/pedidoService";
 import { detallePedidoService } from "../services/detallePedidoService";
+import { getStoredUser } from "../services/authStorage";
 
 const PEDIDO_KEY = "marketflow_pedido_activo";
 const ITEMS_SYNC_KEY = "marketflow_cart_items_sync";
-const CODIGO_USUARIO = "U1";         // Usuario predeterminado hasta implementar auth
 const CODIGO_METODO_PAGO_DEFAULT = "EF"; // Efectivo — código real de tu BD
 
 export interface ItemCarrito {
@@ -81,10 +81,19 @@ export function useCarritoActivo() {
         if (creandoPedido.current) return;
         creandoPedido.current = true;
 
+        const usuario = getStoredUser();
+        if (!usuario?.codigoUsuario) {
+          setError("Debes iniciar sesión para crear un pedido.");
+          setErrorCreandoPedido(true);
+          creandoPedido.current = false;
+          setInicializando(false);
+          return;
+        }
+
         try {
           const hoy = new Date().toISOString().split("T")[0];
           const pedidoCreado = await pedidoService.create({
-            codigoUsuario: CODIGO_USUARIO,
+            codigoUsuario: usuario.codigoUsuario,
             codigoMetodoPago: CODIGO_METODO_PAGO_DEFAULT,
             fecha: hoy,
           });
@@ -325,10 +334,18 @@ export function useCarritoActivo() {
     setErrorCreandoPedido(false);
     setInicializando(true);
     creandoPedido.current = false;
+    const usuario = getStoredUser();
+    if (!usuario?.codigoUsuario) {
+      setError("Debes iniciar sesión para crear un pedido.");
+      setErrorCreandoPedido(true);
+      setInicializando(false);
+      return;
+    }
+
     try {
       const hoy = new Date().toISOString().split("T")[0];
       const pedidoCreado = await pedidoService.create({
-        codigoUsuario: CODIGO_USUARIO,
+        codigoUsuario: usuario.codigoUsuario,
         codigoMetodoPago: CODIGO_METODO_PAGO_DEFAULT,
         fecha: hoy,
       });
