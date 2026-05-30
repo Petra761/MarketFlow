@@ -109,5 +109,25 @@ namespace backend.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("crear-pedido")]
+        public async Task<IActionResult> PostPedido([FromBody] HacerPedidoDTO dto)
+        {
+            if (dto.Detalle == null || !dto.Detalle.Any())
+                return BadRequest("El pedido debe contener al menos un producto.");
+
+            var resultado = await context.RegistrarPedido(dto);
+
+            if (resultado.StartsWith("OK:"))
+            {
+                var codigo = resultado.Split(':')[1];
+                return Ok(new { mensaje = "Pedido realizado con éxito", codigoPedido = codigo });
+            }
+
+            if (resultado.Contains("insuficiente"))
+                return BadRequest(new { mensaje = resultado });
+
+            return StatusCode(500, new { mensaje = resultado });
+        }
     }
 }

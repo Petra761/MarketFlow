@@ -278,7 +278,7 @@ namespace Marketflow.Infraestructura.Repositorios
                 {
                     IdProducto = productoId,
                     CodigoPrecio = CodeGenerator.Generate("PRE"),
-                    Monto = dto.NuevoMonto,
+                    Monto = dto.NuevoPrecio,
                     FechaInicio = DateOnly.FromDateTime(DateTime.Now),
                     FechaFin = null,
                     Estado = "Activo",
