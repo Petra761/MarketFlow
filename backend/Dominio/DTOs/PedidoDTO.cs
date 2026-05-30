@@ -40,4 +40,11 @@ namespace backend.Dominio.DTOs
         public decimal Total { get; set; }
         public List<DetallePedidoRecibidoDTO> Productos { get; set; } = new();
     }
+
+    public class HacerPedidoDTO
+    {
+        public string Codigousuario { get; set; } = string.Empty;
+        public string CodigoMetodoPago { get; set; } = string.Empty;
+        public List<DetallePedidoDTO> Detalle { get; set; } = new();
+    }
 }

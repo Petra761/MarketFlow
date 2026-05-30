@@ -4,14 +4,14 @@ using System.Linq;
 using System.Runtime.Intrinsics.Arm;
 using System.Threading.Tasks;
 using backend.Dominio.DTOs;
+using backend.Dominio.Helpers;
 using backend.Dominio.Interfaces;
 using backend.Dominio.Mapeadores;
 using Marketflow.Dominio.Entidades;
+using Marketflow.Dominio.Interfaces;
 using Marketflow.Infraestructura.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Marketflow.Dominio.Interfaces;
-using backend.Dominio.Helpers;
 
 namespace backend.Infraestructura.Repositorios
 {
@@ -44,8 +44,8 @@ namespace backend.Infraestructura.Repositorios
 
             if (!tieneDetalles)
                 throw new Exception("No puedes confirmar un pedido sin productos");
-                        var detalles = await _context.Detalle_Pedido
-                .Include(d => d.Producto)
+            var detalles = await _context
+                .Detalle_Pedido.Include(d => d.Producto)
                 .Where(d => d.IdPedido == pedido.IdPedido)
                 .ToListAsync();
 
@@ -153,9 +153,12 @@ namespace backend.Infraestructura.Repositorios
 
         public async Task<PedidoDTO> PostPedido([FromBody] CreatePedidoDTO dto)
         {
-            var Usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo");
-            if(Usuario == null)            {
-               throw new Exception("El usuario no existe");
+            var Usuario = await _context.Usuario.FirstOrDefaultAsync(u =>
+                u.CodigoUsuario == dto.CodigoUsuario && u.Estado == "Activo"
+            );
+            if (Usuario == null)
+            {
+                throw new Exception("El usuario no existe");
             }
             var MetodoPago = await _context.Metodo_Pago.FirstOrDefaultAsync(m =>
                 m.CodigoMetodoPago == dto.CodigoMetodoPago && m.Estado == "Activo"
@@ -310,6 +313,102 @@ namespace backend.Infraestructura.Repositorios
             await _context.SaveChangesAsync();
 
             return "Se actualizo correctamente";
+        }
+
+        public async Task<string> RegistrarPedido(HacerPedidoDTO dto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var compradorId = await (
+                    from u in _context.Usuario
+                    where u.CodigoUsuario == dto.Codigousuario
+                    select u.IdUsuario
+                ).FirstOrDefaultAsync();
+
+                var metodoPagoId = await (
+                    from m in _context.Metodo_Pago
+                    where m.CodigoMetodoPago == dto.CodigoMetodoPago
+                    select m.IdMetodoPago
+                ).FirstOrDefaultAsync();
+
+                if (compradorId == 0)
+                    return "Error: Usuario no encontrado.";
+                if (metodoPagoId == 0)
+                    return "Error: Método de pago no encontrado.";
+
+                var nuevoPedido = new Pedido
+                {
+                    IdUsuario = compradorId,
+                    IdMetodoPago = metodoPagoId,
+                    CodigoPedido = CodeGenerator.Generate("PD", 5),
+                    Fecha = DateOnly.FromDateTime(DateTime.Now),
+                    Total = 0,
+                    EstadoPedido = "Pagado",
+                    Estado = "Activo",
+                };
+
+                await _context.Pedido.AddAsync(nuevoPedido);
+                await _context.SaveChangesAsync();
+
+                decimal totalPedido = 0;
+
+                foreach (var item in dto.Detalle)
+                {
+                    var datosProducto = await (
+                        from p in _context.Producto
+                        join pr in _context.Precio on p.IdProducto equals pr.IdProducto
+                        where p.CodigoProducto == item.CodigoProducto && pr.Estado == "Activo"
+                        select new { p.IdProducto, pr.Monto }
+                    ).FirstOrDefaultAsync();
+
+                    if (datosProducto == null)
+                        throw new Exception(
+                            $"Producto {item.CodigoProducto} no encontrado o no tiene precio activo."
+                        );
+
+                    bool haySuficiente = await _stockRepositorio.HayStock(
+                        item.CodigoProducto,
+                        item.cantidad
+                    );
+                    if (!haySuficiente)
+                        throw new Exception(
+                            $"Stock insuficiente para el producto {item.CodigoProducto}."
+                        );
+
+                    decimal subtotal = datosProducto.Monto * item.cantidad;
+                    totalPedido += subtotal;
+
+                    var detalle = new Detalle_Pedido
+                    {
+                        IdPedido = nuevoPedido.IdPedido,
+                        IdProducto = datosProducto.IdProducto,
+                        Cantidad = item.cantidad,
+                        Subtotal = subtotal,
+                    };
+                    await _context.Detalle_Pedido.AddAsync(detalle);
+                }
+
+                nuevoPedido.Total = totalPedido;
+                _context.Pedido.Update(nuevoPedido);
+                await _context.SaveChangesAsync();
+
+                string resultadoStock = await _stockRepositorio.ActualizarStock(
+                    nuevoPedido.CodigoPedido
+                );
+
+                if (resultadoStock.StartsWith("Error"))
+                    throw new Exception(resultadoStock);
+
+                await transaction.CommitAsync();
+                return $"OK:{nuevoPedido.CodigoPedido}";
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return $"Error: {ex.Message}";
+            }
         }
     }
 }

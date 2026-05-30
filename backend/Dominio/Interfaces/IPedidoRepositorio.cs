@@ -21,5 +21,6 @@ namespace backend.Dominio.Interfaces
 
         Task<List<PedidoRecibidoDTO>> ObtenerPedidosPorVendedor(string codigoVendedor);
         Task<string> PedidoRecibido(string codigoPedido);
+        Task<string> RegistrarPedido(HacerPedidoDTO dto);
     }
 }
