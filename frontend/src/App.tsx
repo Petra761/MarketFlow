@@ -1,4 +1,9 @@
 import { BrowserRouter, Routes, Route, Link, Outlet } from "react-router-dom";
+import {
+  LoginPage,
+  RegisterPage,
+  RecuperarContrasenaPage,
+} from "./components/Seguridad";
 
 // --- COMPONENTE DE ESPERA (PLACEHOLDER) ---
 const EnEspera = ({ titulo }: { titulo: string }) => (
@@ -107,17 +112,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Rutas de autenticación (layout propio, sin navbar) */}
+        <Route path="/iniciar-sesion" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro" element={<RegisterPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/recuperar-contrasena" element={<RecuperarContrasenaPage />} />
+        <Route path="/olvide-contrasena" element={<RecuperarContrasenaPage />} />
+
         {/* 1. RUTAS PÚBLICAS */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<EnEspera titulo="Home / Landing Page" />} />
-          <Route
-            path="/iniciar-sesion"
-            element={<EnEspera titulo="Inicio de Sesión" />}
-          />
-          <Route
-            path="/registro"
-            element={<EnEspera titulo="Registro de Usuario" />}
-          />
           <Route
             path="/catalogo"
             element={<EnEspera titulo="Catálogo de Productos" />}

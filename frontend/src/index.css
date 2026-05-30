@@ -1,1 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Inter:wght@100..900&display=swap');
+
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Custom brand colors matching the image */
+  --color-brand-teal-dark: #0a2d3e;     /* Dark navy-teal on left side & form labels */
+  --color-brand-teal-medium: #0d3b4f;   /* Center gradient color */
+  --color-brand-teal-light: #114e68;    /* Lighter teal in gradient */
+  --color-brand-btn: #205c7a;           /* Exact button background */
+  --color-brand-btn-hover: #174861;     /* Darker teal for button hover */
+  --color-brand-text-blue: #0ea5e9;     /* Light blue for upper-case label on left side */
+  --color-brand-link: #1a688b;          /* Links like Register and Forgot Password */
+  --color-brand-link-hover: #124d67;    /* Links hover color */
+  --color-brand-bg-light: #f7f8fa;      /* Clean off-white background on the right */
+  
+  --shadow-btn: 0 4px 10px rgba(32, 92, 122, 0.25);
+  --shadow-btn-hover: 0 6px 14px rgba(32, 92, 122, 0.35);
+}
+
+/* Custom global overrides */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-brand-bg-light);
+  color: #1e293b;
+  margin: 0;
+  padding: 0;
+}
