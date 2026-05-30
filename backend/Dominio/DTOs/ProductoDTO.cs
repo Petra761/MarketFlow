@@ -39,4 +39,10 @@ namespace backend.Dominio.DTOs
         public DateOnly? Fecha { get; set; }
         public string EstadoProducto { get; set; } = string.Empty;
     }
+
+    public class ActualizarPrecioDTO
+    {
+        public string CodigoProducto { get; set; } = string.Empty;
+        public decimal NuevoPrecio { get; set; }
+    }
 }

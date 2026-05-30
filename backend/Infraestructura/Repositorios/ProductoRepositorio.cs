@@ -245,5 +245,57 @@ namespace Marketflow.Infraestructura.Repositorios
 
             return productosBajoStock;
         }
+
+        public async Task<string> ActualizarPrecio(ActualizarPrecioDTO dto)
+        {
+            using var transaction = await context1.Database.BeginTransactionAsync();
+
+            try
+            {
+                var productoId = await (
+                    from p in context1.Producto
+                    where p.CodigoProducto == dto.CodigoProducto
+                    select p.IdProducto
+                ).FirstOrDefaultAsync();
+
+                if (productoId == 0)
+                    return "Error: Producto no encontrado.";
+
+                var precioActual = await (
+                    from pr in context1.Precio
+                    where pr.IdProducto == productoId && pr.Estado == "Activo"
+                    select pr
+                ).FirstOrDefaultAsync();
+
+                if (precioActual != null)
+                {
+                    precioActual.Estado = "Inactivo";
+                    precioActual.FechaFin = DateOnly.FromDateTime(DateTime.Now);
+                    context1.Precio.Update(precioActual);
+                }
+
+                var nuevoPrecio = new Precio
+                {
+                    IdProducto = productoId,
+                    CodigoPrecio = CodeGenerator.Generate("PRE"),
+                    Monto = dto.NuevoMonto,
+                    FechaInicio = DateOnly.FromDateTime(DateTime.Now),
+                    FechaFin = null,
+                    Estado = "Activo",
+                };
+
+                await context1.Precio.AddAsync(nuevoPrecio);
+
+                await context1.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return "OK";
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return $"Error al actualizar el precio: {ex.Message}";
+            }
+        }
     }
 }

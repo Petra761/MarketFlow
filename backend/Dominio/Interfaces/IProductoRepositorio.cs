@@ -18,5 +18,6 @@ namespace backend.Dominio.Interfaces
         Task<List<MisProductosDTO>> GetMisProductos(string codigoUsuario);
 
         Task<List<ProductoStock>> GetBajoStock(string Codigousuario, int cantidad);
+        Task<string> ActualizarPrecio(ActualizarPrecioDTO dto);
     }
 }
