@@ -18,4 +18,10 @@ namespace backend.Dominio.DTOs
         public int Cantidad { get; set; }
         public decimal Subtotal { get; set; }
     }
+
+    public class DetallePedidoDTO
+    {
+        public string CodigoProducto { get; set; } = string.Empty;
+        public int cantidad { get; set; }
+    }
 }

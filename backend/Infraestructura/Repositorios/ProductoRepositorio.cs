@@ -88,7 +88,37 @@ namespace Marketflow.Infraestructura.Repositorios
                 })
                 .ToList();
         }
+        public async Task<List<ProductoDisponibleDTO>> ObtenerProductosDisponibles()
+        {
+            var hoy = DateOnly.FromDateTime(DateTime.Today);
 
+            var productos = await (
+                from p in context1.Producto
+                where p.Estado == "Activo"
+                select new ProductoDisponibleDTO
+                {
+                    CodigoProducto = p.CodigoProducto,
+                    NombreProducto = p.Nombre,
+
+                    Precio = context1.Precio
+                        .Where(pr =>
+                            pr.IdProducto == p.IdProducto &&
+                            pr.Estado == "Activo" &&
+                            pr.FechaInicio <= hoy &&
+                            (pr.FechaFin == null || pr.FechaFin >= hoy))
+                        .Select(pr => pr.Monto)
+                        .FirstOrDefault(),
+
+                    CantidadDisponible = context1.Stock
+                        .Where(s =>
+                            s.IdProducto == p.IdProducto &&
+                            s.Estado == "Activo")
+                        .Sum(s => s.StockActual)
+                }
+            ).ToListAsync();
+
+            return productos;
+        }
         public async Task<ProductoDTO> PostProducto([FromBody] mProductoDTO producto)
         {
             if (string.IsNullOrEmpty(producto.Nombre))

@@ -109,39 +109,42 @@ public class StockRepositorio : IStockRepositorio
         return true;
     }
 
-    public async Task<string> ActualizarStock(string CodigoPedido)
+    public async Task<string> ActualizarStock(string codigoPedido)
     {
         var pedido = await (
             from p in _context.Pedido
-            where p.CodigoPedido == CodigoPedido
+            where p.CodigoPedido == codigoPedido
             select p
         ).FirstOrDefaultAsync();
-        if (pedido is null)
-            return "No se encontro el pedido";
-        var detallles = await (
-            from dp in _context.Detalle_Pedido
-            where dp.IdPedido == pedido.IdPedido
-            select dp
-        ).ToListAsync();
 
-        using var transaccion = await _context.Database.BeginTransactionAsync();
+        if (pedido == null)
+            return "Error: Pedido no encontrado.";
+
+        var detalles = await (
+            from d in _context.Detalle_Pedido
+            where d.IdPedido == pedido.IdPedido
+            select d
+        ).ToListAsync();
 
         try
         {
-            foreach (var item in detallles)
+            foreach (var item in detalles)
             {
                 int cantidadPendiente = item.Cantidad;
 
                 var lotes = await (
                     from s in _context.Stock
-                    where s.IdProducto == item.IdProducto && s.StockActual > 0
-                    orderby s.Fecha
+                    where
+                        s.IdProducto == item.IdProducto && s.StockActual > 0 && s.Estado == "Activo"
+                    orderby s.Fecha, s.IdStock
                     select s
                 ).ToListAsync();
+
                 foreach (var lote in lotes)
                 {
                     if (cantidadPendiente <= 0)
                         break;
+
                     if (lote.StockActual >= cantidadPendiente)
                     {
                         lote.StockActual -= cantidadPendiente;
@@ -153,17 +156,19 @@ public class StockRepositorio : IStockRepositorio
                         lote.StockActual = 0;
                     }
                 }
-                if (cantidadPendiente > 0)
-                    return $"Algo salio mal en el FIFO {item.IdProducto}";
-            }
-            await _context.SaveChangesAsync();
-            await transaccion.CommitAsync();
 
-            return "Se Actualizo el stock correctamente";
+                if (cantidadPendiente > 0)
+                    throw new Exception(
+                        $"Stock insuficiente para el producto ID: {item.IdProducto}"
+                    );
+            }
+
+            await _context.SaveChangesAsync();
+            return "OK";
         }
         catch (Exception ex)
         {
-            return $"error {ex}";
+            throw new Exception(ex.Message);
         }
     }
 

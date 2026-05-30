@@ -4,6 +4,9 @@ import {
   RegisterPage,
   RecuperarContrasenaPage,
 } from "./components/Seguridad";
+import CarritoPage from "./pages/compras/CarritoPage";
+import PagoPage from "./pages/compras/PagoPage";
+import ProductosPruebaPage from "./pages/compras/ProductosPruebaPage";
 
 // --- COMPONENTE DE ESPERA (PLACEHOLDER) ---
 const EnEspera = ({ titulo }: { titulo: string }) => (
@@ -122,11 +125,18 @@ function App() {
 
         {/* 1. RUTAS PÚBLICAS */}
         <Route element={<PublicLayout />}>
-          <Route path="/" element={<EnEspera titulo="Home / Landing Page" />} />
-          <Route
-            path="/catalogo"
-            element={<EnEspera titulo="Catálogo de Productos" />}
-          />
+        <Route path="/" element={<EnEspera titulo="Home / Landing Page" />} />
+
+        <Route
+          path="/iniciar-sesion"
+          element={<EnEspera titulo="Inicio de Sesión" />}
+        />
+
+        <Route
+          path="/registro"
+          element={<EnEspera titulo="Registro de Usuario" />}
+        />
+          <Route path="/catalogo" element={<ProductosPruebaPage />} />
           <Route
             path="/producto/:codigo"
             element={<EnEspera titulo="Detalle del Producto" />}
@@ -135,14 +145,8 @@ function App() {
 
         {/* 2. RUTAS COMPRADOR (CLIENTE) */}
         <Route element={<BuyerLayout />}>
-          <Route
-            path="/carrito"
-            element={<EnEspera titulo="Carrito de Compras" />}
-          />
-          <Route
-            path="/pago"
-            element={<EnEspera titulo="Proceso de Checkout" />}
-          />
+          <Route path="/carrito" element={<CarritoPage />} />
+          <Route path="/pago" element={<PagoPage />} />
           <Route
             path="/mis-pedidos"
             element={<EnEspera titulo="Historial de Pedidos" />}
