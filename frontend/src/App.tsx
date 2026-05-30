@@ -2,6 +2,7 @@ import {
   LoginPage,
   RegisterPage,
   RecuperarContrasenaPage,
+  RestablecerContrasenaPage,
 } from "./components/Seguridad";
 import CarritoPage from "./pages/compras/CarritoPage";
 import PagoPage from "./pages/compras/PagoPage";
@@ -190,6 +191,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/recuperar-contrasena" element={<RecuperarContrasenaPage />} />
         <Route path="/olvide-contrasena" element={<RecuperarContrasenaPage />} />
+        <Route path="/api/Usuarios/CambiarPassword" element={<RestablecerContrasenaPage />} />
+        <Route path="/restablecer-contrasena" element={<RestablecerContrasenaPage />} />
 
         {/* 1. RUTAS PÚBLICAS */}
         <Route element={<PublicLayout />}>

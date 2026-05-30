@@ -11,5 +11,6 @@ namespace backend.Dominio.DTOs
         public string Apellido { get; set; } = string.Empty;
         public string Nickname { get; set; } = string.Empty;
         public string Correo { get; set; } = string.Empty;
+        public string Numero  { get; set; } = string.Empty;
     }
 }

@@ -42,9 +42,8 @@ namespace backend.API.Controllers
             if (usuario == null)
                 return NotFound();
 
-            var usuarioDTO = UsuarioMapeador.ToGetDTO(usuario);
 
-            return Ok(usuarioDTO);
+            return Ok(usuario);
         }
 
         // POST
@@ -168,6 +167,39 @@ namespace backend.API.Controllers
                 mensaje = "Usuario actualizado correctamente"
             });
         }
+        //Actualizar Perfil 
+        [HttpPut("ActualizarPerfil/{codigo}")]
+        public async Task<IActionResult> ActualizarPerfil(string codigo,[FromBody] EditarPerfilDTO dto)
+        {
+            try
+            {
+                var actualizado =
+                    await _usuarioRepositorio
+                        .ActualizarPerfil(codigo, dto);
+
+                if (!actualizado)
+                {
+                    return NotFound(new
+                    {
+                        mensaje = "Usuario no encontrado"
+                    });
+                }
+
+                return Ok(new
+                {
+                    mensaje = "Perfil actualizado correctamente"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    mensaje = ex.Message
+                });
+            }
+        }
+
+
         //Bloquear usuario 
         [HttpPatch("Bloquear/{codigo}")]
         public async Task<IActionResult> Bloquear(string codigo)

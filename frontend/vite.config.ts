@@ -11,6 +11,14 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:5173",
         changeOrigin: true,
+        bypass(req) {
+          if (
+            req.method === "GET" &&
+            req.url?.includes("/Usuarios/CambiarPassword")
+          ) {
+            return "/index.html";
+          }
+        },
       },
     },
   },

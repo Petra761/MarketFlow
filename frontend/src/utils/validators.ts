@@ -59,3 +59,35 @@ export function validatePassword(password: string): string | null {
   }
   return null;
 }
+
+/**
+ * Validates a new password for reset flows (min 8 chars + symbol).
+ */
+export function validateNewPassword(password: string): string | null {
+  if (!password) {
+    return "La contraseña es requerida.";
+  }
+  if (password.length < 8) {
+    return "La contraseña debe tener al menos 8 caracteres.";
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return "La contraseña debe incluir al menos un símbolo.";
+  }
+  return null;
+}
+
+/**
+ * Validates that password and confirmation match.
+ */
+export function validatePasswordMatch(
+  password: string,
+  confirmPassword: string
+): string | null {
+  if (!confirmPassword) {
+    return "Debes confirmar la contraseña.";
+  }
+  if (password !== confirmPassword) {
+    return "Las contraseñas no coinciden.";
+  }
+  return null;
+}
