@@ -22,6 +22,7 @@ namespace Marketflow.Dominio.Entidades
         public DateOnly Fecha { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public string EstadoProducto { get; set; } = "Nuevo";
         public string Estado { get; set; } = "Activo";
+        public string? Imagen { get; set; }
 
         [ForeignKey("IdUsuario")]
         [JsonIgnore]

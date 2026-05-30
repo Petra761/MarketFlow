@@ -13,5 +13,6 @@ namespace backend.Dominio.DTOs
         public DateOnly Fecha { get; set; }
         public decimal? PrecioActual { get; set; }
         public int StockActual { get; set; }
+        public string? Imagen { get; set; }
     }
 }

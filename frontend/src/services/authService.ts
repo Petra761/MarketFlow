@@ -10,6 +10,7 @@ interface BackendLoginResponse {
   mensaje: string;
   rol?: string;
   usuario?: string;
+  codigoUsuario?: string;
 }
 
 interface BackendMessageResponse {
@@ -96,6 +97,7 @@ export async function loginApi(
       name: data.usuario ?? "",
       email: credentials.email,
       role: data.rol ?? "",
+      codigoUsuario: data.codigoUsuario ?? "",
     };
 
     return { success: true, data: user, message: data.mensaje };

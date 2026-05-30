@@ -57,6 +57,22 @@ builder.Services.AddScoped<IReporteAdminRepositorio, ReporteRepositorio>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MarketflowContext>();
+    try
+    {
+        await context.Database.ExecuteSqlRawAsync(
+            "ALTER TABLE \"Producto\" ADD COLUMN IF NOT EXISTS \"Imagen\" TEXT;"
+        );
+        Console.WriteLine("--> Base de datos: Columna 'Imagen' verificada/creada con éxito.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"--> Error al actualizar base de datos: {ex.Message}");
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

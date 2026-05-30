@@ -49,7 +49,14 @@ namespace backend.API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostProducto([FromBody] mProductoDTO producto)
         {
-            return Ok(await context1.PostProducto(producto));
+            try
+            {
+                return Ok(await context1.PostProducto(producto));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message, innerError = ex.InnerException?.Message });
+            }
         }
 
         [HttpPut("{codigo}/{codigoUsuario}")]
@@ -59,7 +66,14 @@ namespace backend.API.Controllers
             [FromBody] ProductoDTO producto
         )
         {
-            return Ok(await context1.PutProducto(codigo, codigoUsuario, producto));
+            try
+            {
+                return Ok(await context1.PutProducto(codigo, codigoUsuario, producto));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message, innerError = ex.InnerException?.Message });
+            }
         }
 
         [HttpDelete("{codigo}/{codigoUsuario}")]

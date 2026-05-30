@@ -91,8 +91,9 @@ namespace backend.API.Controllers
                 return Ok(new
                 {
                     mensaje = "Login correcto",
-                    rol = usuario?.Rol?.Nombre ?? "",                    
-                    usuario = usuario?.Nombre ?? ""
+                    rol = usuario?.Rol?.Nombre ?? "",
+                    usuario = usuario?.Nombre ?? "",
+                    codigoUsuario = usuario?.CodigoUsuario ?? "",
                 });
             }
             catch (Exception ex)
