@@ -20,6 +20,13 @@ export const detallePedidoService = {
     return res.json();
   },
 
+  // GET: api/Detalle_Pedido/pedido/{codigoPedido}
+  getByPedido: async (codigoPedido: string): Promise<any[]> => {
+    const res = await fetch(`${API_BASE}/pedido/${codigoPedido}`);
+    if (!res.ok) throw new Error("Error al obtener detalles del pedido");
+    return res.json();
+  },
+
   // POST: api/Detalle_Pedido
   create: async (detalle: Detalle_PedidoDTO): Promise<string> => {
     const res = await fetch(API_BASE, {

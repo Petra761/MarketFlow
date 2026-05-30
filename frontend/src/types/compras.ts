@@ -79,6 +79,13 @@ export interface PedidoDTO {
   fecha: string;
   total: number;
   estadoPedido: string;
+  productos?: DetallePedidoRecibidoDTO[];
+}
+
+export interface DetallePedidoRecibidoDTO {
+  nombreProducto: string;
+  cantidad: number;
+  subtotal: number;
 }
 
 export interface CreatePedidoDTO {

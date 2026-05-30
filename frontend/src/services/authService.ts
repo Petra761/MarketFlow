@@ -10,6 +10,7 @@ interface BackendLoginResponse {
   mensaje: string;
   rol?: string;
   usuario?: string;
+  codigoUsuario?: string;
 }
 
 interface BackendMessageResponse {
@@ -93,6 +94,7 @@ export async function loginApi(
 
     const data: BackendLoginResponse = JSON.parse(text);
     const user: AuthUser = {
+      codigoUsuario: data.codigoUsuario ?? "",
       name: data.usuario ?? "",
       email: credentials.email,
       role: data.rol ?? "",
@@ -131,6 +133,7 @@ export async function registerApi(
 
     const resData: BackendMessageResponse = await response.json();
     const user: AuthUser = {
+      codigoUsuario: "",
       name: data.nombre,
       email: data.email,
       role: data.role === "seller" ? "Vendedor" : "Comprador",
