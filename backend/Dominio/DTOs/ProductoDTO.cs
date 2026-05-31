@@ -18,6 +18,7 @@ namespace backend.Dominio.DTOs
         public string? Imagen { get; set; }
         public decimal? Precio { get; set; }
         public int? StockActual { get; set; }
+        public string? TelefonoContacto { get; set; }
     }
 
     public class ProductoStock

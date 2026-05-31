@@ -10,6 +10,7 @@ import PagoPage from "./pages/compras/PagoPage";
 import HistorialComprasPage from "./pages/compras/HistorialComprasPage";
 import DetallePedidoPage from "./pages/compras/DetallePedidoPage";
 import CatalogoPage from "./pages/compras/CatalogoPage";
+import ProductoDetallePage from "./pages/compras/ProductoDetallePage";
 import InventarioPage from "./pages/vendedor/InventarioPage";
 import InventarioNuevoPage from "./pages/vendedor/InventarioNuevoPage";
 import InventarioEditarPage from "./pages/vendedor/InventarioEditarPage";
@@ -287,6 +288,7 @@ function App() {
 
         <Route element={<BuyerLayout />}>
           <Route path="/catalogo" element={<CatalogoPage />} />
+          <Route path="/catalogo/:codigo" element={<ProductoDetallePage />} />
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/pago" element={<PagoPage />} />
           <Route path="/mis-pedidos" element={<HistorialComprasPage />} />

@@ -47,6 +47,8 @@ namespace Marketflow.Infraestructura.Repositorios
         {
             var producto = await context1
                 .Producto.Include(p => p.Usuario)
+                .ThenInclude(u => u.TelefonosUsuarios)
+                .ThenInclude(tu => tu.Telefono)
                 .Include(p => p.Categoria)
                 .Include(p => p.Precios)
                 .Include(p => p.Stocks)
@@ -61,6 +63,11 @@ namespace Marketflow.Infraestructura.Repositorios
                 .FirstOrDefault();
             dto.StockActual =
                 producto.Stocks?.Where(s => s.Estado == "Activo").Sum(s => s.StockActual) ?? 0;
+            
+            var telefono = producto.Usuario?.TelefonosUsuarios?
+                .FirstOrDefault(tu => tu.FechaFin == null)?.Telefono;
+            dto.TelefonoContacto = telefono != null ? telefono.Numero : null;
+            
             return dto;
         }
 

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { useProductosDisponibles } from "../../hooks/useProductos";
 import { useCarritoActivo } from "../../hooks/useCarritoActivo";
 import { ShoppingCart, SlidersHorizontal, ChevronDown, Package } from "lucide-react";
@@ -192,12 +192,15 @@ export default function CatalogoPage() {
                     className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                   >
                     {/* Image */}
-                    <div className="relative h-44 bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <Link
+                      to={`/catalogo/${pd.codigoProducto}`}
+                      className="relative h-44 bg-gray-100 flex items-center justify-center overflow-hidden block"
+                    >
                       {pd.imagen ? (
                         <img
                           src={pd.imagen}
                           alt={pd.nombreProducto}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <Package className="text-gray-300" size={52} />
@@ -205,7 +208,7 @@ export default function CatalogoPage() {
                       <span className="absolute top-2 right-2 bg-[#0a4f66] text-white text-xs font-bold px-2 py-0.5 rounded-full">
                         {Number(pd.precio).toLocaleString("es-BO")} Bs
                       </span>
-                    </div>
+                    </Link>
 
                     {/* Info */}
                     <div className="p-4 flex flex-col flex-1">
