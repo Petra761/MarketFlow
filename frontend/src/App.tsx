@@ -9,6 +9,7 @@ import CarritoPage from "./pages/compras/CarritoPage";
 import PagoPage from "./pages/compras/PagoPage";
 import HistorialComprasPage from "./pages/compras/HistorialComprasPage";
 import DetallePedidoPage from "./pages/compras/DetallePedidoPage";
+import CatalogoPage from "./pages/compras/CatalogoPage";
 import InventarioPage from "./pages/vendedor/InventarioPage";
 import InventarioNuevoPage from "./pages/vendedor/InventarioNuevoPage";
 import InventarioEditarPage from "./pages/vendedor/InventarioEditarPage";
@@ -20,8 +21,13 @@ import {
   NavLink,
   Outlet,
   Navigate,
+  useLocation,
+  useNavigate,
+  useSearchParams
 } from "react-router-dom";
 import { ReportesPage } from "./pages/admin/ReportesPage";
+import { Search, ShoppingCart } from "lucide-react";
+import { useCarritoActivo } from "./hooks/useCarritoActivo";
 
 const EnEspera = ({ titulo }: { titulo: string }) => (
   <div className="p-8 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -49,25 +55,105 @@ const PublicLayout = () => (
   </div>
 );
 
-const BuyerLayout = () => (
-  <div className="min-h-screen bg-slate-50">
-    <nav className="bg-white border-b p-4 flex justify-between items-center">
-      <Link to="/" className="font-bold text-blue-600">
-        MarketFlow Cliente
-      </Link>
-      <div className="space-x-6 text-gray-600">
-        <Link to="/carrito">Carrito</Link>
-        <Link to="/mis-pedidos">Mis Compras</Link>
-        <Link to="/perfil" className="font-medium">
-          Mi Perfil
+const BuyerLayout = () => {
+  const { totalItems } = useCarritoActivo();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const busqueda = searchParams.get("q") || "";
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const q = e.target.value;
+    if (location.pathname !== "/catalogo") {
+      navigate(`/catalogo?q=${encodeURIComponent(q)}`);
+    } else {
+      navigate(`?q=${encodeURIComponent(q)}`, { replace: true });
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f5f7fa] flex flex-col">
+      <nav className="bg-[#0a4f66] text-white px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-20">
+        <Link to="/catalogo" className="flex items-center gap-2 font-extrabold text-lg tracking-tight shrink-0">
+          <ShoppingCart size={22} />
+          MarketFlow
         </Link>
-      </div>
-    </nav>
-    <main className="max-w-6xl mx-auto p-6">
-      <Outlet />
-    </main>
-  </div>
-);
+        
+        <div className="flex-1 max-w-2xl mx-6 flex items-center gap-4">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              value={busqueda}
+              onChange={handleSearch}
+              className="w-full bg-[#07384a] text-white placeholder-white/60 pl-4 pr-10 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-white/30 border-none transition-all"
+            />
+            <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80" />
+          </div>
+
+          <NavLink
+            to="/carrito"
+            className={({ isActive }) =>
+              `relative flex items-center transition-colors shrink-0 ${isActive ? "text-[#2be1a4]" : "text-white/80 hover:text-white"}`
+            }
+          >
+            <ShoppingCart size={24} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-red-600 text-white font-bold text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 shadow-sm">
+                {totalItems}
+              </span>
+            )}
+          </NavLink>
+        </div>
+
+        <div className="flex items-center gap-6 shrink-0">
+          <NavLink
+            to="/catalogo"
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors ${isActive ? "text-[#2be1a4]" : "text-white/80 hover:text-white"}`
+            }
+          >
+            Catálogo
+          </NavLink>
+          <NavLink
+            to="/mis-pedidos"
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors ${isActive ? "text-[#2be1a4]" : "text-white/80 hover:text-white"}`
+            }
+          >
+            Mis Pedidos
+          </NavLink>
+          <NavLink
+            to="/perfil"
+            className={({ isActive }) =>
+              `text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                isActive
+                  ? "bg-[#2be1a4] text-[#0a4f66]"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`
+            }
+          >
+            👤 Usuario
+          </NavLink>
+        </div>
+      </nav>
+      <main className="max-w-6xl w-full mx-auto p-6 flex-1">
+        <Outlet />
+      </main>
+
+      <footer className="bg-white border-t border-gray-200 py-4 px-6 flex items-center justify-between text-xs text-gray-500">
+        <span className="font-bold text-[#0a4f66]">MarketFlow</span>
+        <div className="flex gap-4">
+          <span>Privacidad</span>
+          <span>Términos</span>
+          <span>Contacto</span>
+          <span>Sobre Nosotros</span>
+        </div>
+        <span>© 2024 MarketFlow. Todos los derechos reservados.</span>
+      </footer>
+    </div>
+  );
+};
 
 const SellerLayout = () => (
   <div className="min-h-screen bg-zinc-100">
@@ -194,16 +280,13 @@ function App() {
             element={<EnEspera titulo="Registro de Usuario" />}
           />
           <Route
-            path="/catalogo"
-            element={<EnEspera titulo="Catálogo de Productos" />}
-          />
-          <Route
             path="/producto/:codigo"
             element={<EnEspera titulo="Detalle del Producto" />}
           />
         </Route>
 
         <Route element={<BuyerLayout />}>
+          <Route path="/catalogo" element={<CatalogoPage />} />
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/pago" element={<PagoPage />} />
           <Route path="/mis-pedidos" element={<HistorialComprasPage />} />

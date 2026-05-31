@@ -3,7 +3,6 @@ import { useHistorialCompras } from "../../hooks/useHistorialCompras";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Package,
-  Calendar,
   AlertCircle,
   Filter,
   ChevronDown,
@@ -238,10 +237,18 @@ export default function HistorialComprasPage() {
                 {/* Lower Section */}
                 <div className="px-6 py-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
-                    {/* Image Mockup */}
+                    {/* Image */}
                     <div className="relative flex items-center">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden shrink-0 z-10">
-                        <Package className="text-gray-400" size={24} />
+                        {firstProduct?.imagenProducto ? (
+                          <img
+                            src={firstProduct.imagenProducto}
+                            alt={firstProduct.nombreProducto}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Package className="text-gray-400" size={24} />
+                        )}
                       </div>
                       {extraProducts > 0 && (
                         <div className="w-16 h-16 bg-blue-50 text-blue-700 font-bold rounded-lg flex items-center justify-center border border-blue-100 shrink-0 -ml-4 z-0">

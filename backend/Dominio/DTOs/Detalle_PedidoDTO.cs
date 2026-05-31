@@ -17,6 +17,7 @@ namespace backend.Dominio.DTOs
         public string NombreProducto { get; set; } = string.Empty;
         public int Cantidad { get; set; }
         public decimal Subtotal { get; set; }
+        public string? ImagenProducto { get; set; }
     }
 
     public class DetallePedidoDTO
@@ -30,6 +31,7 @@ namespace backend.Dominio.DTOs
         public string CodigoProducto { get; set; } = string.Empty;
         public string NombreProducto { get; set; } = string.Empty;
         public string DescripcionProducto { get; set; } = string.Empty;
+        public string? ImagenProducto { get; set; }
         public int Cantidad { get; set; }
         public decimal Subtotal { get; set; }
     }

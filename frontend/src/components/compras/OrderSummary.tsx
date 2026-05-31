@@ -12,7 +12,6 @@ interface OrderSummaryProps {
 }
 
 export default function OrderSummary({
-  subtotal,
   envio = 0,
   impuestos = 0,
   total,

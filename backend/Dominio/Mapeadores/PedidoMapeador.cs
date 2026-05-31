@@ -30,7 +30,8 @@ namespace backend.Dominio.Mapeadores
                 {
                     NombreProducto = d.Producto?.Nombre ?? "Producto Desconocido",
                     Cantidad = d.Cantidad,
-                    Subtotal = d.Subtotal
+                    Subtotal = d.Subtotal,
+                    ImagenProducto = d.Producto?.Imagen
                 }).ToList() ?? new List<DetallePedidoRecibidoDTO>()
             };
         }

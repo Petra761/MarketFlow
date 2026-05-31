@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
-  ShoppingBag,
 } from "lucide-react";
 
 export default function DetallePedidoPage() {
@@ -142,8 +141,16 @@ export default function DetallePedidoPage() {
             <div className="space-y-4">
               {detalles.map((d) => (
                 <div key={d.codigoProducto} className="flex items-center gap-4 py-4 border-b border-gray-100 last:border-0 last:pb-0">
-                  <div className="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center border border-gray-200 shrink-0">
-                     <Package className="text-gray-400" size={28} />
+                  <div className="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center border border-gray-200 shrink-0 overflow-hidden">
+                    {d.imagenProducto ? (
+                      <img
+                        src={d.imagenProducto}
+                        alt={d.nombreProducto}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Package className="text-gray-400" size={28} />
+                    )}
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">

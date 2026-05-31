@@ -45,8 +45,11 @@ export interface ProductoStock {
 export interface ProductoDisponibleDTO {
   codigoProducto: string;
   nombreProducto: string;
+  nombreCategoria: string;
+  descripcion: string;
   precio: number | null;
   cantidadDisponible: number;
+  imagen?: string | null;
 }
 
 // ===== PRECIO =====
@@ -102,6 +105,7 @@ export interface DetallePedidoRecibidoDTO {
   nombreProducto: string;
   cantidad: number;
   subtotal: number;
+  imagenProducto?: string | null;
 }
 
 export interface CreatePedidoDTO {

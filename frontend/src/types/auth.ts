@@ -3,7 +3,6 @@ export interface AuthUser {
   name: string;
   email: string;
   role: string;
-  codigoUsuario?: string;
 }
 
 export interface LoginCredentials {

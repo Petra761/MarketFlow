@@ -28,6 +28,7 @@ export interface ItemCarrito {
   cantidad: number;
   subtotal: number;
   stockDisponible: number;
+  imagen?: string | null;
 }
 
 function loadPedidoActivo(): string | null {
@@ -41,6 +42,7 @@ function savePedidoActivo(codigo: string) {
 function clearPedidoActivo() {
   localStorage.removeItem(PEDIDO_KEY);
   localStorage.removeItem(ITEMS_SYNC_KEY);
+  window.dispatchEvent(new Event("cart_sync"));
 }
 
 function loadItemsSync(): ItemCarrito[] {
@@ -53,7 +55,12 @@ function loadItemsSync(): ItemCarrito[] {
 }
 
 function saveItemsSync(items: ItemCarrito[]) {
-  localStorage.setItem(ITEMS_SYNC_KEY, JSON.stringify(items));
+  const next = JSON.stringify(items);
+  const current = localStorage.getItem(ITEMS_SYNC_KEY);
+  if (next !== current) {
+    localStorage.setItem(ITEMS_SYNC_KEY, next);
+    window.dispatchEvent(new Event("cart_sync"));
+  }
 }
 
 export function useCarritoActivo() {
@@ -66,6 +73,16 @@ export function useCarritoActivo() {
 
   // Ref para evitar doble creación de pedido en modo StrictMode
   const creandoPedido = useRef(false);
+
+  // Escuchar cambios de otros componentes
+  useEffect(() => {
+    const handleSync = () => {
+      setItems(loadItemsSync());
+      setCodigoPedido(loadPedidoActivo());
+    };
+    window.addEventListener("cart_sync", handleSync);
+    return () => window.removeEventListener("cart_sync", handleSync);
+  }, []);
 
   // ─── PASO 1: Inicializar pedido al montar ───────────────────────────────────
   useEffect(() => {
@@ -136,9 +153,8 @@ export function useCarritoActivo() {
       // Los items ya se cargaron desde loadItemsSync() en el estado inicial
       // Pero para asegurar consistencia, obtenemos todos los detalles y filtramos
       try {
-        const todosLosDetalles = await detallePedidoService.getAll();
-        const detallesDelPedido = todosLosDetalles.filter((d: any) => d.codigoPedido === codigo);
-        
+        // Obtenemos todos los detalles
+        await detallePedidoService.getAll();
         // Mapear los DTOs devueltos por el backend al formato de ItemCarrito
         // Como el DTO backend solo tiene CodigoProducto y Cantidad, lo cruzamos con los items de localStorage si es posible
         // O confiamos en el sincronizado de localStorage.
@@ -169,6 +185,7 @@ export function useCarritoActivo() {
         nombreProducto: string;
         precio: number;
         cantidadDisponible: number;
+        imagen?: string | null;
       },
       cantidadAgregada: number = 1
     ) => {
@@ -235,6 +252,7 @@ export function useCarritoActivo() {
             cantidad,
             subtotal: Number((cantidad * precio).toFixed(2)),
             stockDisponible: stock,
+            imagen: prod.imagen ?? null,
           };
           setItems((prev) => [...prev, nuevoItem]);
         }

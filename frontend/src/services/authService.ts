@@ -98,7 +98,6 @@ export async function loginApi(
       name: data.usuario ?? "",
       email: credentials.email,
       role: data.rol ?? "",
-      codigoUsuario: data.codigoUsuario ?? "",
     };
 
     return { success: true, data: user, message: data.mensaje };

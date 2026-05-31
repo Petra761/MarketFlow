@@ -13,9 +13,9 @@ export function usePedido() {
     try {
       setLoading(true);
       setError(null);
-      const codigoPedido = await pedidoService.create(pedido);
-      setCodigoPedidoActual(codigoPedido);
-      return codigoPedido;
+      const pedidoResponse = await pedidoService.create(pedido);
+      setCodigoPedidoActual(pedidoResponse.codigoPedido);
+      return pedidoResponse.codigoPedido;
     } catch (err: any) {
       setError(err.message);
       throw err;

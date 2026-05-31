@@ -54,7 +54,10 @@ namespace backend.Dominio.DTOs
     {
         public string CodigoProducto { get; set; } = string.Empty;
         public string NombreProducto { get; set; } = string.Empty;
+        public string NombreCategoria { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
         public decimal Precio { get; set; }
         public int CantidadDisponible { get; set; }
+        public string? Imagen { get; set; }
     }
 }

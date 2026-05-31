@@ -58,6 +58,7 @@ namespace backend.Infraestructura.Repositorios
                     CodigoProducto = d.Producto.CodigoProducto,
                     NombreProducto = d.Producto.Nombre,
                     DescripcionProducto = d.Producto.Descripcion,
+                    ImagenProducto = d.Producto.Imagen,
                     Cantidad = d.Cantidad,
                     Subtotal = d.Subtotal
                 })
