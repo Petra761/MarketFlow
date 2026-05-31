@@ -8,6 +8,8 @@ import PagoPage from "./pages/compras/PagoPage";
 import ProductosPruebaPage from "./pages/compras/ProductosPruebaPage";
 import { BrowserRouter, Routes, Route, Link, NavLink, Outlet } from "react-router-dom";
 import { ReportesPage } from "./pages/admin/ReportesPage";
+import { CategoriasPage } from "./pages/admin/CategoriasPage";
+import { UsuariosPage } from "./pages/admin/UsuariosPage";
 
 // --- COMPONENTE DE ESPERA (PLACEHOLDER) ---
 const EnEspera = ({ titulo }: { titulo: string }) => (
@@ -267,14 +269,8 @@ function App() {
             path="/admin/resumen"
             element={<EnEspera titulo="Métricas Globales" />}
           />
-          <Route
-            path="/admin/usuarios"
-            element={<EnEspera titulo="Gestión de Usuarios" />}
-          />
-          <Route
-            path="/admin/categorias"
-            element={<EnEspera titulo="Gestión de Categorías" />}
-          />
+          <Route path="/admin/usuarios" element={<UsuariosPage />} />
+          <Route path="/admin/categorias" element={<CategoriasPage />} />
           <Route path="/admin/reportes" element={<ReportesPage />} />
         </Route>
 

@@ -20,32 +20,80 @@ namespace backend.API.Controllers
         } 
 
         [HttpGet]
-        public async Task<IActionResult>GetCategorias()
+        public async Task<IActionResult> GetCategorias()
         {
-            return Ok(await context1.GetCategorias());
+            try
+            {
+                return Ok(await context1.GetCategorias());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
+
         [HttpGet("{codigo}")]
-        public async Task<IActionResult>GetCategoria(string codigo)
+        public async Task<IActionResult> GetCategoria(string codigo)
         {
-            return Ok(await context1.GetCategoria(codigo));
+            try
+            {
+                return Ok(await context1.GetCategoria(codigo));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> PostCategoria([FromBody] mCategoriaDTO categoria)
         {
-            return Ok(await context1.PostCategoria(categoria));
+            try
+            {
+                return Ok(await context1.PostCategoria(categoria));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
-        
+
         [HttpPut("{codigo}")]
-        public async Task<IActionResult>PutCategoria(string codigo, [FromBody]CategoriaDTO categoria)
+        public async Task<IActionResult> PutCategoria(string codigo, [FromBody] CategoriaDTO categoria)
         {
-            return Ok(await context1.PutCategoria(codigo,categoria));
+            try
+            {
+                return Ok(await context1.PutCategoria(codigo, categoria));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
-        
+
         [HttpDelete("{codigo}")]
-        public async Task<IActionResult>Delete(string codigo)
+        public async Task<IActionResult> Delete(string codigo)
         {
-            return Ok(await context1.DeleteCategoria(codigo));
+            try
+            {
+                return Ok(await context1.DeleteCategoria(codigo));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+        [HttpGet("Administracion")]
+        public async Task<IActionResult> GetCategoriasAdmin()
+        {
+            try
+            {
+                return Ok(await context1.GetCategoriasAdmin());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
     }
 }

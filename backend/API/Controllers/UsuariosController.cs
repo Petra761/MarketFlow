@@ -51,30 +51,19 @@ namespace backend.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CrearUsuario(UsuarioDTO dto)
         {
-            var rol = await _usuarioRepositorio
-                .ObtenerRolPorCodigo(dto.CodigoRol);
-
-            if (rol == null)
+            try
             {
-                return BadRequest("El rol no existe");
+                await _usuarioRepositorio.CrearUsuario(dto);
+
+                return Ok(new
+                {
+                    mensaje = "Usuario creado correctamente"
+                });
             }
-
-            var usuario = new Usuario
+            catch (Exception ex)
             {
-                IdRol = rol.IdRol,
-                Nombre = dto.Nombre,
-                Apellido = dto.Apellido,
-                Nickname = dto.Nickname,
-                Correo = dto.Correo,
-                Contrasenia = dto.Contrasenia
-            };
-
-            await _usuarioRepositorio.CrearUsuario(dto);
-
-            return Ok(new
-            {
-                mensaje = "Usuario creado correctamente"
-            });
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
 
         //Login

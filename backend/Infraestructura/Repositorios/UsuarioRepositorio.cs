@@ -29,7 +29,7 @@ namespace backend.Infraestructura.Repositorios
         {
             return await _context.Usuario
                 .Include(u => u.Rol)
-                .Where(u => u.Estado == "Activo")
+                .Where(u => u.Estado == "Activo" || u.Estado == "Bloqueado")
                 .ToListAsync();
         }
 
@@ -107,25 +107,29 @@ namespace backend.Infraestructura.Repositorios
             _context.Usuario.Add(nuevoUsuario);
             await _context.SaveChangesAsync();
 
-            var telefono = new Telefono
+            // Solo crear teléfono si se proporcionó un número
+            if (!string.IsNullOrWhiteSpace(dto.Numero))
             {
-                CodigoTelefono = CodeGenerator.Generate("TEL"),
-                Numero = dto.Numero,
-                Estado = "Activo"
-            };
+                var telefono = new Telefono
+                {
+                    CodigoTelefono = CodeGenerator.Generate("TEL"),
+                    Numero = dto.Numero,
+                    Estado = "Activo"
+                };
 
-            _context.Telefono.Add(telefono);
-            await _context.SaveChangesAsync();
+                _context.Telefono.Add(telefono);
+                await _context.SaveChangesAsync();
 
-            var telefonoUsuario = new Telefono_Usuario
-            {
-                IdTelefono = telefono.IdTelefono,
-                IdUsuario = nuevoUsuario.IdUsuario,
-                FechaInicio = DateOnly.FromDateTime(DateTime.Now)
-            };
+                var telefonoUsuario = new Telefono_Usuario
+                {
+                    IdTelefono = telefono.IdTelefono,
+                    IdUsuario = nuevoUsuario.IdUsuario,
+                    FechaInicio = DateOnly.FromDateTime(DateTime.Now)
+                };
 
-            _context.Telefono_Usuario.Add(telefonoUsuario);
-            await _context.SaveChangesAsync();
+                _context.Telefono_Usuario.Add(telefonoUsuario);
+                await _context.SaveChangesAsync();
+            }
 
             return nuevoUsuario;
         }
