@@ -1,5 +1,4 @@
 import { useCarritoActivo } from "../../hooks/useCarritoActivo";
-import { useProductosDisponibles } from "../../hooks/useProductos";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -21,12 +20,7 @@ export default function CarritoPage() {
     reintentar,
   } = useCarritoActivo();
 
-  const { productosDisponibles, loading: loadingProductos } = useProductosDisponibles();
-  const [cantidades, setCantidades] = useState<Record<string, number>>({});
-
-  const handleCantidadChange = (codigo: string, valor: number) => {
-    setCantidades((prev) => ({ ...prev, [codigo]: Math.max(1, valor) }));
-  };
+  const [, setCantidades] = useState<Record<string, number>>({});
 
   if (inicializando) {
     return (
@@ -96,13 +90,17 @@ export default function CarritoPage() {
           ) : (
             items.map((item) => (
               <div key={item.codigoProducto} className="cart-item-card">
-                <div className="cart-item-image">
-                  <svg className="cart-item-image-placeholder" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                  </svg>
-                </div>
+                  <div className="cart-item-image">
+                    {item.imagen ? (
+                      <img src={item.imagen} alt={item.nombreProducto} className="w-12 h-12 object-cover rounded-lg" />
+                    ) : (
+                      <svg className="cart-item-image-placeholder" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <path d="M21 15l-5-5L5 21" />
+                      </svg>
+                    )}
+                  </div>
                 <div className="cart-item-info">
                   <div className="cart-item-name">{item.nombreProducto}</div>
                   <div className="cart-item-desc">{item.codigoProducto}</div>
@@ -142,7 +140,7 @@ export default function CarritoPage() {
 
           <button
             className="seguir-comprando"
-            onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}
+            onClick={() => navigate("/catalogo")}
           >
             ← Seguir Comprando
           </button>
@@ -190,67 +188,6 @@ export default function CarritoPage() {
             <div className="order-summary-secure">🔒 Transacción 100% segura</div>
           </div>
         </div>
-      </div>
-
-      {/* Productos Disponibles */}
-      <div className="productos-disponibles">
-        <h2>Productos Disponibles</h2>
-        {loadingProductos ? (
-          <div className="productos-loading">
-            <div className="spinner-lg"></div>
-            <p>Cargando productos...</p>
-          </div>
-        ) : (
-          <div className="productos-grid">
-            {productosDisponibles
-              .filter((pd) => pd.cantidadDisponible > 0 && pd.precio > 0)
-              .map((pd) => {
-                const enCarrito = items.find((i) => i.codigoProducto === pd.codigoProducto);
-                const cantidadInput = cantidades[pd.codigoProducto] || 1;
-                const stockRestante = pd.cantidadDisponible - (enCarrito?.cantidad || 0);
-
-                return (
-                  <div key={pd.codigoProducto} className="producto-card">
-                    <div className="producto-card-image">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5">
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <path d="M21 15l-5-5L5 21" />
-                      </svg>
-                    </div>
-                    <div className="producto-card-info">
-                      <h4>{pd.nombreProducto}</h4>
-                      <p className="producto-card-marca" style={{ fontSize: "0.75rem", color: "#94a3b8" }}>{pd.codigoProducto}</p>
-                      <p className="producto-card-precio">{Number(pd.precio).toLocaleString("es-BO")} Bs</p>
-                      <p className="producto-card-stock">
-                        Stock: {pd.cantidadDisponible}
-                        {enCarrito && <span style={{ color: "#0d7377", marginLeft: "0.4rem" }}>({enCarrito.cantidad} en carrito)</span>}
-                      </p>
-                    </div>
-
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%" }}>
-                      <input
-                        type="number"
-                        min="1"
-                        max={stockRestante}
-                        value={cantidadInput}
-                        onChange={(e) => handleCantidadChange(pd.codigoProducto, parseInt(e.target.value) || 1)}
-                        style={{ width: "55px", padding: "4px 6px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "0.9rem" }}
-                      />
-                      <button
-                        className="producto-card-add"
-                        style={{ flex: 1 }}
-                        onClick={() => agregarProducto(pd, cantidadInput)}
-                        disabled={loading || stockRestante <= 0}
-                      >
-                        {loading ? "..." : stockRestante <= 0 ? "Sin stock" : "+ Agregar"}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        )}
       </div>
     </div>
   );

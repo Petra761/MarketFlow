@@ -31,4 +31,12 @@ namespace backend.Dominio.DTOs
 
         public string NuevaPassword { get; set; } = string.Empty;
     }
+    public class EditarPerfilDTO
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Nickname { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+        public string Numero { get; set; } = string.Empty;
+    }
 }

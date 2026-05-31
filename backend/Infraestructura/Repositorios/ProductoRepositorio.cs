@@ -47,11 +47,28 @@ namespace Marketflow.Infraestructura.Repositorios
         {
             var producto = await context1
                 .Producto.Include(p => p.Usuario)
+                .ThenInclude(u => u.TelefonosUsuarios)
+                .ThenInclude(tu => tu.Telefono)
                 .Include(p => p.Categoria)
+                .Include(p => p.Precios)
+                .Include(p => p.Stocks)
                 .FirstOrDefaultAsync(p => p.CodigoProducto == codigo && p.Estado == "Activo");
             if (producto == null)
                 throw new Exception("El producto no existe.");
-            return producto.toProductoDTO();
+
+            var dto = producto.toProductoDTO();
+            dto.Precio = producto
+                .Precios?.Where(pr => pr.Estado == "Activo" && pr.FechaFin == null)
+                .Select(pr => (decimal?)pr.Monto)
+                .FirstOrDefault();
+            dto.StockActual =
+                producto.Stocks?.Where(s => s.Estado == "Activo").Sum(s => s.StockActual) ?? 0;
+            
+            var telefono = producto.Usuario?.TelefonosUsuarios?
+                .FirstOrDefault(tu => tu.FechaFin == null)?.Telefono;
+            dto.TelefonoContacto = telefono != null ? telefono.Numero : null;
+            
+            return dto;
         }
 
         public async Task<List<MisProductosDTO>> GetMisProductos(string codigoUsuario)
@@ -85,6 +102,7 @@ namespace Marketflow.Infraestructura.Repositorios
                         .FirstOrDefault(),
                     StockActual =
                         p.Stocks?.Where(s => s.Estado == "Activo").Sum(s => s.StockActual) ?? 0,
+                    Imagen = p.Imagen,
                 })
                 .ToList();
         }
@@ -94,11 +112,15 @@ namespace Marketflow.Infraestructura.Repositorios
 
             var productos = await (
                 from p in context1.Producto
+                join c in context1.Categoria on p.IdCategoria equals c.IdCategoria
                 where p.Estado == "Activo"
                 select new ProductoDisponibleDTO
                 {
                     CodigoProducto = p.CodigoProducto,
                     NombreProducto = p.Nombre,
+                    NombreCategoria = c.Nombre,
+                    Descripcion = p.Descripcion,
+                    Imagen = p.Imagen,
 
                     Precio = context1.Precio
                         .Where(pr =>
@@ -151,13 +173,16 @@ namespace Marketflow.Infraestructura.Repositorios
                 Descripcion = producto.Descripcion ?? "",
                 Marca = string.IsNullOrEmpty(producto.Marca) ? "Sin marca" : producto.Marca,
                 Fecha = DateOnly.FromDateTime(DateTime.Now),
-                EstadoProducto = "Nuevo",
+                EstadoProducto = string.IsNullOrEmpty(producto.EstadoProducto)
+                    ? "Nuevo"
+                    : producto.EstadoProducto,
+                Imagen = producto.Imagen,
             };
             context1.Producto.Add(product);
 
             await context1.SaveChangesAsync();
 
-            if (producto.CantidadInicial != null)
+            if (producto.CantidadInicial != null && producto.CantidadInicial > 0)
             {
                 var stock = new StockReposicionDTO
                 {
@@ -206,8 +231,57 @@ namespace Marketflow.Infraestructura.Repositorios
             product.Descripcion = producto.Descripcion ?? "";
             product.Marca = string.IsNullOrEmpty(producto.Marca) ? "Sin marca" : producto.Marca;
             product.EstadoProducto = producto.EstadoProducto;
+            if (producto.Imagen != null)
+                product.Imagen = producto.Imagen;
 
             await context1.SaveChangesAsync();
+
+            if (producto.Precio.HasValue && producto.Precio.Value > 0)
+            {
+                var precioResult = await ActualizarPrecio(
+                    new ActualizarPrecioDTO
+                    {
+                        CodigoProducto = codigo,
+                        NuevoPrecio = producto.Precio.Value,
+                    }
+                );
+                if (precioResult != "OK")
+                    throw new Exception(precioResult);
+            }
+
+            if (producto.StockActual.HasValue)
+            {
+                var lotes = await context1
+                    .Stock.Where(s => s.IdProducto == product.IdProducto && s.Estado == "Activo")
+                    .OrderByDescending(s => s.Fecha)
+                    .ThenByDescending(s => s.IdStock)
+                    .ToListAsync();
+
+                if (!lotes.Any())
+                {
+                    await context2.ReponerProducto(
+                        new StockReposicionDTO
+                        {
+                            CodigoProducto = codigo,
+                            CantidadIngreasada = producto.StockActual.Value,
+                        }
+                    );
+                }
+                else
+                {
+                    var lotePrincipal = lotes.First();
+                    lotePrincipal.StockActual = producto.StockActual.Value;
+                    lotePrincipal.StockInicial = Math.Max(
+                        lotePrincipal.StockInicial,
+                        producto.StockActual.Value
+                    );
+
+                    foreach (var lote in lotes.Skip(1))
+                        lote.StockActual = 0;
+
+                    await context1.SaveChangesAsync();
+                }
+            }
 
             await context1.Entry(product).Reference(p => p.Usuario).LoadAsync();
             await context1.Entry(product).Reference(p => p.Categoria).LoadAsync();

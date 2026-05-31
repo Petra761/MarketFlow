@@ -13,6 +13,7 @@ namespace backend.Dominio.DTOs
         public DateOnly Fecha { get; set; }
         public decimal Total { get; set; }
         public string EstadoPedido { get; set; } = "Pendiente";
+        public List<DetallePedidoRecibidoDTO> Productos { get; set; } = new();
     }
 
     public class CreatePedidoDTO

@@ -10,6 +10,7 @@ interface BackendLoginResponse {
   mensaje: string;
   rol?: string;
   usuario?: string;
+  codigoUsuario?: string;
 }
 
 interface BackendMessageResponse {
@@ -93,6 +94,7 @@ export async function loginApi(
 
     const data: BackendLoginResponse = JSON.parse(text);
     const user: AuthUser = {
+      codigoUsuario: data.codigoUsuario ?? "",
       name: data.usuario ?? "",
       email: credentials.email,
       role: data.rol ?? "",
@@ -131,6 +133,7 @@ export async function registerApi(
 
     const resData: BackendMessageResponse = await response.json();
     const user: AuthUser = {
+      codigoUsuario: "",
       name: data.nombre,
       email: data.email,
       role: data.role === "seller" ? "Vendedor" : "Comprador",
@@ -174,6 +177,42 @@ export async function recoverAccountApi(
     return { success: true, message: data.mensaje };
   } catch (error) {
     console.error("recoverAccountApi:", error);
+    return { success: false, message: CONNECTION_ERROR };
+  }
+}
+
+/** POST /api/Usuarios/CambiarPassword */
+export async function changePasswordApi(
+  email: string,
+  newPassword: string
+): Promise<ServiceResult> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/Usuarios/CambiarPassword`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        correo: email,
+        nuevaPassword: newPassword,
+      }),
+    });
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      let message = `Error del servidor: ${response.status}`;
+      try {
+        const json = JSON.parse(text) as { mensaje?: string };
+        message = json.mensaje ?? message;
+      } catch {
+        if (text) message = text.replace(/^"|"$/g, "");
+      }
+      return { success: false, message };
+    }
+
+    const data: BackendMessageResponse = JSON.parse(text);
+    return { success: true, message: data.mensaje?.trim() };
+  } catch (error) {
+    console.error("changePasswordApi:", error);
     return { success: false, message: CONNECTION_ERROR };
   }
 }

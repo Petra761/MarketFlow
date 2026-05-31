@@ -118,6 +118,8 @@ namespace backend.Infraestructura.Repositorios
             var pedidos = await _context
                 .Pedido.Include(p => p.Usuario)
                 .Include(p => p.MetodoPago)
+                .Include(p => p.DetallesPedido!)
+                    .ThenInclude(d => d.Producto)
                 .Where(p => p.Usuario.CodigoUsuario == codigoUsuario && p.Estado != "Inactivo")
                 .OrderByDescending(p => p.Fecha)
                 .ToListAsync();

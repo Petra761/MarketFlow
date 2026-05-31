@@ -10,10 +10,11 @@ namespace backend.Dominio.Interfaces
     public interface IUsuarioRepositorio
     {
         Task<List<Usuario>> ListarUsuarios();
-        Task<Usuario?> ObtenerUsuarioCodigo(string codigo);
+        Task<UsuarioPefirlDTO?> ObtenerUsuarioCodigo(string codigo);
         Task<Usuario?> CrearUsuario(UsuarioDTO usuario);
         Task<Rol?> ObtenerRolPorCodigo(string codigoRol);
         Task<bool> ActualizarUsuario(string codigo, Usuario usuario);
+        Task<bool> ActualizarPerfil(string codigo, EditarPerfilDTO dto);
         Task<bool> EliminarUsuario(string codigo);
         Task<Usuario?> IniciarSesion(LoginDTO dto);
         Task RecuperarCuenta(string correo);

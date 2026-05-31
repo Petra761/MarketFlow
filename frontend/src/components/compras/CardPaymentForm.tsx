@@ -9,7 +9,6 @@ interface CardPaymentFormProps {
 }
 
 export default function CardPaymentForm({
-  total,
   onPagar,
   onVolver,
   onCancelar,

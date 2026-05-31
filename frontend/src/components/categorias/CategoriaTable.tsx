@@ -42,7 +42,7 @@ const iconColors = [
 ];
 
 export function CategoriaTable({ categorias, loading, searchTerm, onEdit, onDelete }: Props) {
-  const filtered = categorias.filter(
+  const filtered = (categorias ?? []).filter(
     (c) =>
       c.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.codigoCategoria.toLowerCase().includes(searchTerm.toLowerCase())

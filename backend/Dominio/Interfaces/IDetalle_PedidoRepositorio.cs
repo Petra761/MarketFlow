@@ -13,5 +13,6 @@ namespace backend.Dominio.Interfaces
         Task<Detalle_PedidoDTO> PostDetalle_Pedido([FromBody] Detalle_PedidoDTO dto);
         Task<Detalle_PedidoDTO> PutDetalle_Pedido(string CodigoPedido, string CodigoProducto, [FromBody] Detalle_PedidoDTO dto);
         Task<Detalle_PedidoDTO> DeleteDetalle_Pedido(string CodigoPedido, string CodigoProducto);
+        Task<List<DetallePedidoClienteDTO>> GetDetallesPorPedido(string codigoPedido);
     }
 }

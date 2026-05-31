@@ -71,7 +71,7 @@ namespace backend.Dominio.Mapeadores
                 Nombre = usuario.Nombre,
                 Apellido = usuario.Apellido,
                 Nickname = usuario.Nickname,
-                Correo = usuario.Correo
+                
             };
         }
         public static List<UsuarioDTO> ToDTOList(List<Usuario> usuarios)
@@ -83,6 +83,7 @@ namespace backend.Dominio.Mapeadores
         {
             return usuarios.Select(u => ToGetDTO(u)).ToList();
         }
+      
     }
 }
 

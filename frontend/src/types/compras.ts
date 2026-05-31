@@ -4,12 +4,17 @@ export interface Producto {
   idUsuario: number;
   idCategoria: number;
   codigoProducto: string;
+  codigoCategoria?: string;
+  codigoUsuario?: string;
   nombre: string;
   descripcion: string;
   marca: string;
   fecha: string;
   estadoProducto: string;
   estado: string;
+  imagen?: string | null;
+  precio?: number | null;
+  stockActual?: number | null;
   precios?: Precio[];
   stocks?: Stock[];
 }
@@ -24,13 +29,27 @@ export interface MisProductosDTO {
   fecha: string;
   precioActual: number | null;
   stockActual: number;
+  imagen?: string | null;
+}
+
+export interface ProductoStock {
+  codigoProducto: string;
+  nombre: string;
+  categoria: string;
+  descripcion: string;
+  marca: string;
+  stock: number;
+  estado: string;
 }
 
 export interface ProductoDisponibleDTO {
   codigoProducto: string;
   nombreProducto: string;
+  nombreCategoria: string;
+  descripcion: string;
   precio: number | null;
   cantidadDisponible: number;
+  imagen?: string | null;
 }
 
 // ===== PRECIO =====
@@ -79,6 +98,14 @@ export interface PedidoDTO {
   fecha: string;
   total: number;
   estadoPedido: string;
+  productos?: DetallePedidoRecibidoDTO[];
+}
+
+export interface DetallePedidoRecibidoDTO {
+  nombreProducto: string;
+  cantidad: number;
+  subtotal: number;
+  imagenProducto?: string | null;
 }
 
 export interface CreatePedidoDTO {

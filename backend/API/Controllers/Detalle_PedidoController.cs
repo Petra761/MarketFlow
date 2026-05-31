@@ -24,6 +24,12 @@ namespace backend.API.Controllers
         {
             return Ok(await context.GetDetalle_Pedido());
         }
+        [HttpGet("pedido/{codigoPedido}")]
+        public async Task<IActionResult> GetDetallesPorPedido(string codigoPedido)
+        {
+            var detalles = await context.GetDetallesPorPedido(codigoPedido);
+            return Ok(detalles);
+        }
         // GET: api/Detalle_Pedido/5
         [HttpGet("{CodigoPedido}/{CodigoProducto}")]
         public async Task<IActionResult> GetDetalle_PedidoByCodigo(string CodigoPedido, string CodigoProducto)

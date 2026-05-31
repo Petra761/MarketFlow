@@ -34,12 +34,28 @@ namespace backend.Infraestructura.Repositorios
         }
 
 
-        public async Task<Usuario?> ObtenerUsuarioCodigo(string codigo)
+             public async Task<UsuarioPefirlDTO?> ObtenerUsuarioCodigo(string codigo)
         {
-            return await _context.Usuario
-                .Include(u => u.Rol)
-                .FirstOrDefaultAsync(u => u.CodigoUsuario == codigo);
+            return await (
+            from u in _context.Usuario
+            join tu in _context.Telefono_Usuario
+                on u.IdUsuario equals tu.IdUsuario
+            join t in _context.Telefono
+                on tu.IdTelefono equals t.IdTelefono
+            where u.CodigoUsuario == codigo
+                && u.Estado == "Activo"
+                && tu.FechaFin == null
+            select new UsuarioPefirlDTO
+            {
+                Nombre = u.Nombre,
+                Apellido = u.Apellido,
+                Nickname = u.Nickname,
+                Correo = u.Correo,
+                Numero = t.Numero
+            }
+        ).FirstOrDefaultAsync();
         }
+        
 
        public async Task<Usuario?> CrearUsuario(UsuarioDTO dto)
         {
@@ -206,6 +222,126 @@ namespace backend.Infraestructura.Repositorios
 
             return true;
         }
+
+        public async Task<bool> ActualizarPerfil(string codigo,EditarPerfilDTO dto)
+        {
+            var usuario = await _context.Usuario
+                .FirstOrDefaultAsync(u =>
+                    u.CodigoUsuario == codigo &&
+                    u.Estado == "Activo");
+
+            if (usuario == null)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(dto.Correo))
+            {
+                bool emailValido = Regex.IsMatch(
+                    dto.Correo,
+                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                );
+
+                if (!emailValido)
+                {
+                    throw new Exception(
+                        "El correo no tiene un formato válido"
+                    );
+                }
+
+                bool existeCorreo =
+                    await _context.Usuario.AnyAsync(u =>
+                        u.Correo == dto.Correo &&
+                        u.IdUsuario != usuario.IdUsuario);
+
+                if (existeCorreo)
+                {
+                    throw new Exception(
+                        "El correo ya está registrado"
+                    );
+                }
+            }
+
+            usuario.Nombre = dto.Nombre;
+            usuario.Apellido = dto.Apellido;
+            usuario.Nickname = dto.Nickname;
+            usuario.Correo = dto.Correo;
+
+            // Actualizar teléfono si cambió
+            if (!string.IsNullOrWhiteSpace(dto.Numero))
+            {
+                var telefonoUsuarioActual =
+                    await _context.Telefono_Usuario
+                    .FirstOrDefaultAsync(tu =>
+                        tu.IdUsuario == usuario.IdUsuario &&
+                        tu.FechaFin == null);
+
+                if (telefonoUsuarioActual != null)
+                {
+                    var telefonoActual =
+                        await _context.Telefono
+                        .FirstOrDefaultAsync(t =>
+                            t.IdTelefono ==
+                            telefonoUsuarioActual.IdTelefono);
+
+                    if (
+                        telefonoActual != null &&
+                        telefonoActual.Numero != dto.Numero
+                    )
+                    {
+                        bool existeTelefono =
+                            await _context.Telefono
+                            .AnyAsync(t =>
+                                t.Numero == dto.Numero &&
+                                t.Estado == "Activo");
+
+                        if (existeTelefono)
+                        {
+                            throw new Exception(
+                                "El número de teléfono ya está registrado"
+                            );
+                        }
+
+                        telefonoUsuarioActual.FechaFin =
+                            DateOnly.FromDateTime(DateTime.Now);
+
+                        var nuevoTelefono = new Telefono
+                        {
+                            CodigoTelefono =
+                                CodeGenerator.Generate("TEL"),
+                            Numero = dto.Numero,
+                            Estado = "Activo"
+                        };
+
+                        _context.Telefono.Add(nuevoTelefono);
+
+                        await _context.SaveChangesAsync();
+
+                        var nuevaRelacion =
+                            new Telefono_Usuario
+                            {
+                                IdTelefono =
+                                    nuevoTelefono.IdTelefono,
+                                IdUsuario =
+                                    usuario.IdUsuario,
+                                FechaInicio =
+                                    DateOnly.FromDateTime(
+                                        DateTime.Now
+                                    ),
+                                FechaFin = null
+                            };
+
+                        _context.Telefono_Usuario
+                            .Add(nuevaRelacion);
+                    }
+                }
+            }
+
+            _context.Usuario.Update(usuario);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
 
         
         public async Task<bool> EliminarUsuario(string codigo)

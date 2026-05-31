@@ -47,6 +47,25 @@ namespace backend.Infraestructura.Repositorios
                                 .ToListAsync();
             return detalle_pedido.Select(d => d.toDetalle_PedidoDTO()).ToList();
         }
+        public async Task<List<DetallePedidoClienteDTO>> GetDetallesPorPedido(string codigoPedido)
+        {
+            var detalles = await _context.Detalle_Pedido
+                .Include(d => d.Pedido)
+                .Include(d => d.Producto)
+                .Where(d => d.Pedido.CodigoPedido == codigoPedido)
+                .Select(d => new DetallePedidoClienteDTO
+                {
+                    CodigoProducto = d.Producto.CodigoProducto,
+                    NombreProducto = d.Producto.Nombre,
+                    DescripcionProducto = d.Producto.Descripcion,
+                    ImagenProducto = d.Producto.Imagen,
+                    Cantidad = d.Cantidad,
+                    Subtotal = d.Subtotal
+                })
+                .ToListAsync();
+
+            return detalles;
+        }
         public async Task<Detalle_PedidoDTO> GetDetalle_PedidoByCodigo(string CodigoPedido, string CodigoProducto)
         {
             var detalle_pedido = await _context.Detalle_Pedido

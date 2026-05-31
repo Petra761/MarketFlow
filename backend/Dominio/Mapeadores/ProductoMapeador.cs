@@ -15,6 +15,7 @@ namespace backend.Dominio.Mapeadores
                 return null;
             return new ProductoDTO()
             {
+                CodigoProducto = producto.CodigoProducto,
                 CodigoUsuario = producto.Usuario?.CodigoUsuario ?? "N/A",
                 CodigoCategoria = producto.Categoria?.CodigoCategoria ?? "N/A",
                 Nombre = producto.Nombre,
@@ -22,6 +23,7 @@ namespace backend.Dominio.Mapeadores
                 Marca = producto.Marca,
                 Fecha = producto.Fecha,
                 EstadoProducto = producto.EstadoProducto,
+                Imagen = producto.Imagen,
             };
         }
     }
