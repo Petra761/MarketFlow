@@ -12,6 +12,7 @@ namespace backend.Dominio.Interfaces
         Task<List<Usuario>> ListarUsuarios();
         Task<UsuarioPefirlDTO?> ObtenerUsuarioCodigo(string codigo);
         Task<Usuario?> CrearUsuario(UsuarioDTO usuario);
+        Task<bool> CorreoExisteAsync(string correo);
         Task<Rol?> ObtenerRolPorCodigo(string codigoRol);
         Task<bool> ActualizarUsuario(string codigo, Usuario usuario);
         Task<bool> ActualizarPerfil(string codigo, EditarPerfilDTO dto);

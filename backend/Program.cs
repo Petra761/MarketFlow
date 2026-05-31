@@ -5,10 +5,14 @@ using Marketflow.Infraestructura.Data;
 using Marketflow.Infraestructura.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using backend.API.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiExceptionFilter>();
+});
 
 builder.Services.AddOpenApi();
 
@@ -87,6 +91,35 @@ app.UseHttpsRedirection();
 app.MapScalarApiReference();
 
 app.UseCors("AllowAll");
+
+// Errores de negocio en /api/* siempre responden JSON (evita la pantalla amarilla de Development).
+app.Use(async (context, next) =>
+{
+    if (!context.Request.Path.StartsWithSegments("/api"))
+    {
+        await next();
+        return;
+    }
+
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        if (context.Response.HasStarted)
+            throw;
+
+        var statusCode = ex.Message.Contains("ya está registrado", StringComparison.OrdinalIgnoreCase)
+            ? StatusCodes.Status409Conflict
+            : StatusCodes.Status400BadRequest;
+
+        context.Response.Clear();
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json; charset=utf-8";
+        await context.Response.WriteAsJsonAsync(new { mensaje = ex.Message });
+    }
+});
 
 app.MapControllers();
 

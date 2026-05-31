@@ -28,6 +28,12 @@ const CONNECTION_ERROR =
 async function parseErrorMessage(response: Response): Promise<string> {
   const text = await response.text();
   if (!text) return `Error del servidor: ${response.status}`;
+
+  const trimmed = text.trim();
+  if (trimmed.startsWith("<!DOCTYPE") || trimmed.startsWith("<html")) {
+    return "Ocurrió un error en el servidor. Intenta de nuevo.";
+  }
+
   try {
     const json = JSON.parse(text) as { mensaje?: string; title?: string };
     return json.mensaje ?? json.title ?? text;
@@ -116,7 +122,10 @@ export async function registerApi(
 
     const response = await fetch(`${API_BASE_URL}/Usuarios`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify({
         codigoRol,
         nombre: data.nombre,
@@ -124,6 +133,7 @@ export async function registerApi(
         nickname: data.username,
         correo: data.email,
         contrasenia: data.password,
+        numero: data.telefono,
       }),
     });
 

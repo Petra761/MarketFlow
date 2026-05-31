@@ -92,9 +92,7 @@ namespace backend.Infraestructura.Repositorios
 
             if (existe)
             {
-                throw new Exception(
-                    "El correo ya está registrado"
-                );
+                return null;
             }
 
             var rol = await _context.Rol
@@ -144,6 +142,14 @@ namespace backend.Infraestructura.Repositorios
             await _context.SaveChangesAsync();
 
             return nuevoUsuario;
+        }
+
+        public async Task<bool> CorreoExisteAsync(string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo))
+                return false;
+
+            return await _context.Usuario.AnyAsync(u => u.Correo == correo);
         }
 
         public async Task<bool> ActualizarUsuario(string codigo, Usuario usuario)
