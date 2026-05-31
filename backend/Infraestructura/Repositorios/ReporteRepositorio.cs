@@ -169,15 +169,19 @@ namespace backend.Infraestructura.Repositorios
             return ventas;
         }
 
-        public async Task<List<ProductoMasVendidoDTO>>
-            ObtenerProductosMasVendidos()
+        public async Task<List<ProductoMasVendidoDTO>> ObtenerProductosMasVendidos()
         {
             var productos = await _context.Detalle_Pedido
                 .Where(d => d.Pedido!.Estado == "Activo")
-                .GroupBy(d => d.Producto!.Nombre)
+                .GroupBy(d => new
+                {
+                    d.Producto!.Nombre,
+                    d.Producto.Imagen
+                })
                 .Select(g => new ProductoMasVendidoDTO
                 {
-                    Producto = g.Key,
+                    Producto = g.Key.Nombre,
+                    Imagen = g.Key.Imagen,
                     CantidadVendida = g.Sum(d => d.Cantidad),
                     TotalGenerado = g.Sum(d => d.Subtotal)
                 })
@@ -186,6 +190,7 @@ namespace backend.Infraestructura.Repositorios
 
             return productos;
         }
+
         public async Task<List<UsuarioEstadisticaDTO>>ObtenerCrecimientoUsuarios()
         {
                 var datos = await _context.Usuario

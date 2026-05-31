@@ -10,6 +10,9 @@
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { ReportesPage } from "./pages/admin/ReportesPage";
+import { CategoriasPage } from "./pages/admin/CategoriasPage";
+import { UsuariosPage } from "./pages/admin/UsuariosPage";
 import { Search, ShoppingCart } from "lucide-react";
 
 import { useAuth } from "./hooks/useAuth";
@@ -38,7 +41,6 @@ import InventarioEditarPage from "./pages/vendedor/InventarioEditarPage";
 import VentasRecibidasPage from "./pages/vendedor/VentasRecibidasPage";
 import ReportesVendedorPage from "./pages/vendedor/ReportesVendedorPage";
 
-import { ReportesPage } from "./pages/admin/ReportesPage";
 
 const EnEspera = ({ titulo }: { titulo: string }) => (
   <div className="p-8 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -140,7 +142,10 @@ const BuyerLayout = () => {
           <NavLink
             to="/perfil"
             className={({ isActive }) =>
-              `text-sm font-medium px-3 py-1.5 rounded-lg ${isActive ? "bg-[#2be1a4] text-[#0a4f66]" : "bg-white/10 text-white hover:bg-white/20"}`
+              `text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${isActive
+                ? "bg-[#2be1a4] text-[#0a4f66]"
+                : "bg-white/10 text-white hover:bg-white/20"
+              }`
             }
           >
             Mi Perfil
@@ -211,10 +216,9 @@ const SellerLayout = () => {
 
 const AdminLayout = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${
-      isActive
-        ? "bg-[#2be1a4] text-[#0b333b] shadow-md shadow-[#2be1a4]/10"
-        : "text-teal-100 hover:bg-[#154650] hover:text-white"
+    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${isActive
+      ? "bg-[#2be1a4] text-[#0b333b] shadow-md shadow-[#2be1a4]/10"
+      : "text-teal-100 hover:bg-[#154650] hover:text-white"
     }`;
 
   return (
@@ -225,9 +229,6 @@ const AdminLayout = () => {
             MarketFlow Admin
           </h2>
           <nav className="flex flex-col space-y-1.5">
-            <NavLink to="/admin/resumen" className={linkClass}>
-              Resumen
-            </NavLink>
             <NavLink to="/admin/usuarios" className={linkClass}>
               Usuarios
             </NavLink>
@@ -362,14 +363,8 @@ function App() {
             path="/admin/resumen"
             element={<EnEspera titulo="Métricas Globales" />}
           />
-          <Route
-            path="/admin/usuarios"
-            element={<EnEspera titulo="Gestión de Usuarios" />}
-          />
-          <Route
-            path="/admin/categorias"
-            element={<EnEspera titulo="Gestión de Categorías" />}
-          />
+          <Route path="/admin/usuarios" element={<UsuariosPage />} />
+          <Route path="/admin/categorias" element={<CategoriasPage />} />
           <Route path="/admin/reportes" element={<ReportesPage />} />
         </Route>
 

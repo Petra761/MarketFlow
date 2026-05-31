@@ -93,5 +93,21 @@ namespace backend.Infraestructura.Repositorios
             await context1.SaveChangesAsync();
             return cat.toCategoriaDTO();
         }
+
+        public async Task<List<CategoriaAdminDTO>> GetCategoriasAdmin()
+        {
+            return await context1.Categoria
+                .Where(c => c.Estado == "Activo")
+                .Select(c => new CategoriaAdminDTO
+                {
+                    CodigoCategoria = c.CodigoCategoria,
+                    Nombre = c.Nombre,
+                    CantidadProductos = context1.Producto
+                        .Count(p => p.IdCategoria == c.IdCategoria)
+                })
+                .ToListAsync();
+        }
+
+
     }
 }

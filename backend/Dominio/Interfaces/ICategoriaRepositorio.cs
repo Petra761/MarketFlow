@@ -15,5 +15,6 @@ namespace backend.Dominio.Interfaces
         Task<CategoriaDTO> PostCategoria([FromBody] mCategoriaDTO categoria);
         Task<CategoriaDTO> DeleteCategoria(string codigo);
         Task<CategoriaDTO> PutCategoria(string codigo,[FromBody] CategoriaDTO dto);
+        Task<List<CategoriaAdminDTO>> GetCategoriasAdmin();
     }
 }

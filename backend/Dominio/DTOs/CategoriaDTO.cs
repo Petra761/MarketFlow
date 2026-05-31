@@ -15,4 +15,11 @@ namespace backend.Dominio.DTOs
     {
         public string Nombre { get; set; } = string.Empty;
     }
+    public class CategoriaAdminDTO
+    {
+        public string CodigoCategoria { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public int CantidadProductos { get; set; }
+    }
+
 }

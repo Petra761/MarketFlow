@@ -8,10 +8,16 @@ using Scalar.AspNetCore;
 using backend.API.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllers(options =>
 {
+    // Mantiene tu filtro global de excepciones (HEAD)
     options.Filters.Add<ApiExceptionFilter>();
+})
+.AddJsonOptions(options =>
+{
+    // Mantiene la política de nombres camelCase (feature/adriana)
+    options.JsonSerializerOptions.PropertyNamingPolicy = 
+        System.Text.Json.JsonNamingPolicy.CamelCase;
 });
 
 builder.Services.AddOpenApi();

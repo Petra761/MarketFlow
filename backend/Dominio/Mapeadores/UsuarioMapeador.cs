@@ -40,7 +40,11 @@ namespace backend.Dominio.Mapeadores
         {
             return new UsuarioGetDTO
             {
-                Rol = usuario.Rol!.Nombre,
+                CodigoUsuario = usuario.CodigoUsuario,
+                CodigoRol = usuario.Rol?.CodigoRol ?? string.Empty,
+                NombreRol = usuario.Rol?.Nombre ?? string.Empty,
+                Rol = usuario.Rol?.Nombre ?? string.Empty,
+                Estado = usuario.Estado,
                 Nombre = usuario.Nombre,
                 Apellido = usuario.Apellido,
                 Nickname = usuario.Nickname,
