@@ -13,3 +13,5 @@ export { RecuperarContrasenaPage } from "./RecuperarContrasenaPage";
 export { RestablecerContrasenaPage } from "./RestablecerContrasenaPage";
 export { PasswordStrengthBar } from "./PasswordStrengthBar";
 export { HelpCard } from "./HelpCard";
+export { RoleReadonly } from "./RoleReadonly";
+export { EditarPerfilPage } from "./EditarPerfilPage";

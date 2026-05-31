@@ -3,8 +3,10 @@ import {
   RegisterPage,
   RecuperarContrasenaPage,
   RestablecerContrasenaPage,
+  EditarPerfilPage,
 } from "./components/Seguridad";
 import RequireRole from "./components/RequireRole";
+import { useAuth } from "./hooks/useAuth";
 import CarritoPage from "./pages/compras/CarritoPage";
 import PagoPage from "./pages/compras/PagoPage";
 import HistorialComprasPage from "./pages/compras/HistorialComprasPage";
@@ -58,6 +60,7 @@ const PublicLayout = () => (
 
 const BuyerLayout = () => {
   const { totalItems } = useCarritoActivo();
+  const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -134,8 +137,15 @@ const BuyerLayout = () => {
               }`
             }
           >
-            👤 Usuario
+            Mi Perfil
           </NavLink>
+          <button
+            type="button"
+            onClick={logout}
+            className="text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer"
+          >
+            Cerrar sesión
+          </button>
         </div>
       </nav>
       <main className="max-w-6xl w-full mx-auto p-6 flex-1">
@@ -156,7 +166,10 @@ const BuyerLayout = () => {
   );
 };
 
-const SellerLayout = () => (
+const SellerLayout = () => {
+  const { logout } = useAuth();
+
+  return (
   <div className="min-h-screen bg-zinc-100">
     <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
       <Link
@@ -165,18 +178,32 @@ const SellerLayout = () => (
       >
         MarketFlow · Vendedor
       </Link>
-      <Link
-        to="/iniciar-sesion"
-        className="text-sm font-medium text-slate-500 hover:text-slate-700"
-      >
-        Cerrar sesión
-      </Link>
+      <div className="flex items-center gap-5">
+        <NavLink
+          to="/vendedor/perfil"
+          className={({ isActive }) =>
+            `text-sm font-medium transition-colors ${
+              isActive ? "text-[#30718d]" : "text-slate-500 hover:text-slate-700"
+            }`
+          }
+        >
+          Mi Perfil
+        </NavLink>
+        <button
+          type="button"
+          onClick={logout}
+          className="text-sm font-medium text-slate-500 hover:text-slate-700 cursor-pointer"
+        >
+          Cerrar sesión
+        </button>
+      </div>
     </header>
     <main className="p-6 lg:p-8">
       <Outlet />
     </main>
   </div>
-);
+  );
+};
 
 const AdminLayout = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -268,6 +295,23 @@ function App() {
           element={<RestablecerContrasenaPage />}
         />
 
+        <Route
+          path="/perfil"
+          element={
+            <RequireRole allowed={["buyer", "seller", "admin"]}>
+              <EditarPerfilPage closePath="/catalogo" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/vendedor/perfil"
+          element={
+            <RequireRole allowed={["seller", "admin"]}>
+              <EditarPerfilPage closePath="/vendedor/inventario" />
+            </RequireRole>
+          }
+        />
+
         <Route element={<PublicLayout />}>
           <Route path="/" element={<EnEspera titulo="Home / Landing Page" />} />
 
@@ -293,10 +337,6 @@ function App() {
           <Route path="/pago" element={<PagoPage />} />
           <Route path="/mis-pedidos" element={<HistorialComprasPage />} />
           <Route path="/mis-pedidos/:codigo" element={<DetallePedidoPage />} />
-          <Route
-            path="/perfil"
-            element={<EnEspera titulo="Perfil y Configuración" />}
-          />
         </Route>
 
         <Route element={<SellerLayout />}>

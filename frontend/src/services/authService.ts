@@ -2,8 +2,10 @@ import { API_BASE_URL } from "../config/api";
 import type {
   AuthUser,
   LoginCredentials,
+  ProfileData,
   RegisterData,
   ServiceResult,
+  UpdateProfileData,
 } from "../types/auth";
 
 interface BackendLoginResponse {
@@ -223,6 +225,64 @@ export async function changePasswordApi(
     return { success: true, message: data.mensaje?.trim() };
   } catch (error) {
     console.error("changePasswordApi:", error);
+    return { success: false, message: CONNECTION_ERROR };
+  }
+}
+
+/** GET /api/Usuarios/ObtenerUsuario/{codigo} */
+export async function getProfileApi(
+  codigoUsuario: string
+): Promise<ServiceResult<ProfileData>> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Usuarios/ObtenerUsuario/${encodeURIComponent(codigoUsuario)}`,
+      { headers: { Accept: "application/json" } }
+    );
+
+    if (!response.ok) {
+      return { success: false, message: await parseErrorMessage(response) };
+    }
+
+    const data = (await response.json()) as ProfileData;
+    return { success: true, data };
+  } catch (error) {
+    console.error("getProfileApi:", error);
+    return { success: false, message: CONNECTION_ERROR };
+  }
+}
+
+/** PUT /api/Usuarios/ActualizarPerfil/{codigo} */
+export async function updateProfileApi(
+  codigoUsuario: string,
+  data: UpdateProfileData
+): Promise<ServiceResult> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Usuarios/ActualizarPerfil/${encodeURIComponent(codigoUsuario)}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          nombre: data.nombre,
+          apellido: data.apellido,
+          nickname: data.nickname,
+          correo: data.correo,
+          numero: data.numero,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      return { success: false, message: await parseErrorMessage(response) };
+    }
+
+    const resData: BackendMessageResponse = await response.json();
+    return { success: true, message: resData.mensaje?.trim() };
+  } catch (error) {
+    console.error("updateProfileApi:", error);
     return { success: false, message: CONNECTION_ERROR };
   }
 }

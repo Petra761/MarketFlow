@@ -2,7 +2,7 @@ import { useCallback, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
 import type { AuthUser } from "../types/auth";
 import {
-  clearAuthUser,
+  clearSession,
   getStoredUser,
 } from "../services/authStorage";
 
@@ -22,8 +22,7 @@ export function useAuth() {
   );
 
   const logout = useCallback(() => {
-    clearAuthUser();
-    window.dispatchEvent(new Event("storage"));
+    clearSession();
     navigate("/iniciar-sesion");
   }, [navigate]);
 
