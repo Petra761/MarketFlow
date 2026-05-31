@@ -10,8 +10,8 @@ interface Props {
   onSubmit: (data: UsuarioDTO | UsuarioPutDTO, codigo?: string) => Promise<void>;
 }
 
-interface CrearForm extends UsuarioDTO {}
-interface EditarForm extends UsuarioPutDTO {}
+interface CrearForm extends UsuarioDTO { }
+interface EditarForm extends UsuarioPutDTO { }
 
 const emptyCrear: CrearForm = {
   codigoRol: "",

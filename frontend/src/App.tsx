@@ -215,9 +215,6 @@ const AdminLayout = () => {
             </div>
           </div>
           <nav className="flex flex-col space-y-1.5">
-            <NavLink to="/admin/resumen" className={linkClass}>
-              Resumen
-            </NavLink>
             <NavLink to="/admin/usuarios" className={linkClass}>
               Gestionar Usuarios
             </NavLink>

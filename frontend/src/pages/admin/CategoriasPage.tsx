@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCategorias } from "../../hooks/useCategorias";
+import { useCategorias } from "../../hooks/useCategoriaAdmin";
 import { CategoriaTable } from "../../components/categorias/CategoriaTable";
 import { CategoriaModal } from "../../components/categorias/CategoriaModal";
 import { CategoriaDeleteDialog } from "../../components/categorias/CategoriaDeleteDialog";
@@ -100,23 +100,20 @@ export function CategoriasPage() {
       )}
 
       {/* ── Encabezado ── */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-teal-500 mb-1">
-            Workspace
-          </p>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-[#0a2540] tracking-tight">
             Gestión de Categorías
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Administra las categorías de productos del sistema
+            Administra las categorías de productos
           </p>
         </div>
 
         <button
           id="btn-nueva-categoria"
           onClick={openCrear}
-          className="mt-3 sm:mt-0 flex items-center gap-2 self-start rounded-xl bg-[#0b333b] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#154650] hover:shadow-md active:scale-[0.98]"
+          className="mt-3 sm:mt-0 flex items-center gap-2 self-start rounded-lg bg-[#276b7e] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1f5666]"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -148,8 +145,8 @@ export function CategoriasPage() {
       {/* ── Buscador ── */}
       <div className="relative">
         <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
           </svg>
         </div>
         <input
@@ -158,7 +155,7 @@ export function CategoriasPage() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Buscar categoría específica..."
-          className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20"
+          className="w-full rounded-lg border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm outline-none transition focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
         />
         {searchTerm && (
           <button

@@ -26,7 +26,7 @@ export function CantidadVendidaChart({
       ) : (
         <div className="flex flex-col justify-end h-full min-h-[300px] pb-2">
           <div
-            className="flex items-end justify-center gap-8 sm:gap-12 px-2"
+            className="flex items-end justify-start sm:justify-center gap-8 sm:gap-12 px-2 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-200"
             role="img"
             aria-label="Gráfica de cantidad vendida por categoría"
           >
@@ -40,7 +40,7 @@ export function CantidadVendidaChart({
               return (
                 <div
                   key={item.categoria}
-                  className="flex flex-col items-center flex-1 max-w-[64px]"
+                  className="flex flex-col items-center flex-1 min-w-[50px] max-w-[64px] shrink-0"
                 >
                   {/* Etiqueta con el valor encima de la barra */}
                   <span

@@ -10,5 +10,6 @@ namespace backend.Dominio.DTOs
         public string Producto { get; set; } = string.Empty;
         public int CantidadVendida { get; set; }
         public decimal TotalGenerado { get; set; }
+        public string? Imagen { get; set; }
     }
 }
