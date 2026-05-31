@@ -229,30 +229,7 @@ export default function InventarioPage() {
           </div>
 
         </section>
-
-
-
-        <section className="rounded-2xl border border-dashed border-slate-200 bg-white/60 p-5">
-
-          <h3 className="text-sm font-bold uppercase tracking-wide text-slate-500">
-
-            Historial de ventas
-
-          </h3>
-
-          <p className="mt-2 text-xs leading-relaxed text-slate-400">
-
-            Métricas de ventas por periodo se implementarán en el módulo de
-
-            pedidos del vendedor.
-
-          </p>
-
-        </section>
-
       </aside>
-
-
 
       <div className="min-w-0 flex-1">
 

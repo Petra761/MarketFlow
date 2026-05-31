@@ -47,8 +47,6 @@ namespace Marketflow.Infraestructura.Repositorios
         {
             var producto = await context1
                 .Producto.Include(p => p.Usuario)
-                .ThenInclude(u => u.TelefonosUsuarios)
-                .ThenInclude(tu => tu.Telefono)
                 .Include(p => p.Categoria)
                 .Include(p => p.Precios)
                 .Include(p => p.Stocks)
@@ -63,11 +61,6 @@ namespace Marketflow.Infraestructura.Repositorios
                 .FirstOrDefault();
             dto.StockActual =
                 producto.Stocks?.Where(s => s.Estado == "Activo").Sum(s => s.StockActual) ?? 0;
-            
-            var telefono = producto.Usuario?.TelefonosUsuarios?
-                .FirstOrDefault(tu => tu.FechaFin == null)?.Telefono;
-            dto.TelefonoContacto = telefono != null ? telefono.Numero : null;
-            
             return dto;
         }
 
@@ -112,15 +105,11 @@ namespace Marketflow.Infraestructura.Repositorios
 
             var productos = await (
                 from p in context1.Producto
-                join c in context1.Categoria on p.IdCategoria equals c.IdCategoria
                 where p.Estado == "Activo"
                 select new ProductoDisponibleDTO
                 {
                     CodigoProducto = p.CodigoProducto,
                     NombreProducto = p.Nombre,
-                    NombreCategoria = c.Nombre,
-                    Descripcion = p.Descripcion,
-                    Imagen = p.Imagen,
 
                     Precio = context1.Precio
                         .Where(pr =>

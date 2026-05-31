@@ -1,4 +1,4 @@
-import type { PedidoDTO, CreatePedidoDTO, UpdatePedidoDTO } from "../types/compras";
+import type { PedidoDTO, CreatePedidoDTO, UpdatePedidoDTO, PedidoRecibidoDTO } from "../types/compras";
 
 const API_BASE = "/api/Pedido";
 
@@ -83,6 +83,13 @@ export const pedidoService = {
       const errText = await res.text();
       throw new Error(errText || "Error al pagar pedido");
     }
+  },
+
+  // GET: api/Pedido/recibidos/{codigoVendedor}
+  getRecibidos: async (codigoVendedor: string): Promise<PedidoRecibidoDTO[]> => {
+    const res = await fetch(`${API_BASE}/recibidos/${codigoVendedor}`);
+    if (!res.ok) throw new Error("Error al obtener ventas recibidas");
+    return res.json();
   },
 
   // DELETE: api/Pedido/{CodigoPedido}
