@@ -15,6 +15,7 @@ export const LoginPage: React.FC = () => {
     setPassword,
     isLoading,
     errors,
+    successMessage,
     handleSubmit,
   } = useLogin();
 
@@ -26,6 +27,7 @@ export const LoginPage: React.FC = () => {
     >
       <FormContainer title="Inicia sesión" subtitle="Ingresa tus credenciales para continuar">
         <form onSubmit={handleSubmit} className="space-y-6">
+          {successMessage && <AuthAlert message={successMessage} variant="success" />}
           {errors.general && <AuthAlert message={errors.general} />}
 
           <Input

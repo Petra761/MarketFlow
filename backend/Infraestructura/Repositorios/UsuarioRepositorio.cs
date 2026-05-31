@@ -460,7 +460,7 @@ namespace backend.Infraestructura.Repositorios
             }
 
             string link =
-            $"http://localhost:5173/api/Usuarios/CambiarPassword";
+            $"http://localhost:5174/api/Usuarios/CambiarPassword";
 
             await EnviarCorreoRecuperacion(
                 correo,

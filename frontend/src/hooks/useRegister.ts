@@ -2,8 +2,6 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import type { RegisterData } from "../types/auth";
 import { registerApi } from "../services/authService";
-import { saveAuthUser } from "../services/authStorage";
-import { getRedirectPathForRole } from "../utils/authRoutes";
 import {
   validateRequired,
   validateEmail,
@@ -66,13 +64,12 @@ export function useRegister() {
     try {
       const result = await registerApi(payload);
 
-      if (result.success && result.data) {
-        saveAuthUser(result.data);
-        const path = getRedirectPathForRole(result.data.role);
-        setTimeout(() => {
-          setIsLoading(false);
-          navigate(path);
-        }, 1200);
+      if (result.success) {
+        setIsLoading(false);
+        navigate("/iniciar-sesion", {
+          state: { registered: true, email },
+          replace: true,
+        });
       } else {
         setIsLoading(false);
         setErrors({

@@ -1,14 +1,27 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { loginApi } from "../services/authService";
 import { saveAuthUser } from "../services/authStorage";
 import { getRedirectPathForRole } from "../utils/authRoutes";
 import { validateEmail, validatePassword } from "../utils/validators";
 
+interface LoginLocationState {
+  registered?: boolean;
+  email?: string;
+}
+
 export function useLogin() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const loginState = (location.state as LoginLocationState | null) ?? {};
+
+  const [email, setEmail] = useState(loginState.email ?? "");
   const [password, setPassword] = useState("");
+  const [successMessage] = useState(
+    loginState.registered
+      ? "Cuenta creada correctamente. Inicia sesión con tu correo y contraseña."
+      : ""
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -58,6 +71,7 @@ export function useLogin() {
     setPassword,
     isLoading,
     errors,
+    successMessage,
     handleSubmit,
   };
 }
