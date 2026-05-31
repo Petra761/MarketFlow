@@ -105,26 +105,29 @@ namespace Marketflow.Infraestructura.Repositorios
 
             var productos = await (
                 from p in context1.Producto
+                join c in context1.Categoria on p.IdCategoria equals c.IdCategoria
                 where p.Estado == "Activo"
                 select new ProductoDisponibleDTO
                 {
                     CodigoProducto = p.CodigoProducto,
                     NombreProducto = p.Nombre,
+                    NombreCategoria = c.Nombre,
+                    Descripcion = p.Descripcion,
+                    Imagen = p.Imagen,
 
-                    Precio = context1.Precio
-                        .Where(pr =>
-                            pr.IdProducto == p.IdProducto &&
-                            pr.Estado == "Activo" &&
-                            pr.FechaInicio <= hoy &&
-                            (pr.FechaFin == null || pr.FechaFin >= hoy))
+                    Precio = context1
+                        .Precio.Where(pr =>
+                            pr.IdProducto == p.IdProducto
+                            && pr.Estado == "Activo"
+                            && pr.FechaInicio <= hoy
+                            && (pr.FechaFin == null || pr.FechaFin >= hoy)
+                        )
                         .Select(pr => pr.Monto)
                         .FirstOrDefault(),
 
-                    CantidadDisponible = context1.Stock
-                        .Where(s =>
-                            s.IdProducto == p.IdProducto &&
-                            s.Estado == "Activo")
-                        .Sum(s => s.StockActual)
+                    CantidadDisponible = context1
+                        .Stock.Where(s => s.IdProducto == p.IdProducto && s.Estado == "Activo")
+                        .Sum(s => s.StockActual),
                 }
             ).ToListAsync();
 

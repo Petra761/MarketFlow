@@ -26,3 +26,20 @@ export interface ServiceResult<T = void> {
   data?: T;
   message?: string;
 }
+
+export interface ProfileData {
+  rol: string;
+  nombre: string;
+  apellido: string;
+  nickname: string;
+  correo: string;
+  numero: string;
+}
+
+export interface UpdateProfileData {
+  nombre: string;
+  apellido: string;
+  nickname: string;
+  correo: string;
+  numero: string;
+}

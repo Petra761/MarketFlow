@@ -50,30 +50,34 @@ namespace backend.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CrearUsuario(UsuarioDTO dto)
         {
-            var rol = await _usuarioRepositorio
-                .ObtenerRolPorCodigo(dto.CodigoRol);
-
-            if (rol == null)
+            try
             {
-                return BadRequest("El rol no existe");
+                var rol = await _usuarioRepositorio
+                    .ObtenerRolPorCodigo(dto.CodigoRol);
+
+                if (rol == null)
+                {
+                    return BadRequest(new { mensaje = "El rol no existe" });
+                }
+
+                if (await _usuarioRepositorio.CorreoExisteAsync(dto.Correo))
+                {
+                    return Conflict(new { mensaje = "El correo ya está registrado" });
+                }
+
+                var creado = await _usuarioRepositorio.CrearUsuario(dto);
+
+                if (creado == null)
+                {
+                    return Conflict(new { mensaje = "El correo ya está registrado" });
+                }
+
+                return Ok(new { mensaje = "Usuario creado correctamente" });
             }
-
-            var usuario = new Usuario
+            catch (Exception ex)
             {
-                IdRol = rol.IdRol,
-                Nombre = dto.Nombre,
-                Apellido = dto.Apellido,
-                Nickname = dto.Nickname,
-                Correo = dto.Correo,
-                Contrasenia = dto.Contrasenia
-            };
-
-            await _usuarioRepositorio.CrearUsuario(dto);
-
-            return Ok(new
-            {
-                mensaje = "Usuario creado correctamente"
-            });
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
 
         //Login
@@ -155,18 +159,30 @@ namespace backend.API.Controllers
         [HttpPut("ActualizarUsuario/{codigo}")]
         public async Task<IActionResult> ActualizarUsuario(string codigo, UsuarioPutDTO dto)
         {
-            var usuario = UsuarioMapeador.ToEntityPut(dto);
-
-            var actualizado = await _usuarioRepositorio
-                .ActualizarUsuario(codigo, usuario);
-
-            if (!actualizado)
-                return NotFound();
-
-            return Ok(new
+            try
             {
-                mensaje = "Usuario actualizado correctamente"
-            });
+                var usuario = UsuarioMapeador.ToEntityPut(dto);
+
+                var actualizado = await _usuarioRepositorio
+                    .ActualizarUsuario(codigo, usuario);
+
+                if (!actualizado)
+                    return NotFound();
+
+                return Ok(new
+                {
+                    mensaje = "Usuario actualizado correctamente"
+                });
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("ya está registrado", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Conflict(new { mensaje = ex.Message });
+                }
+
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
         //Actualizar Perfil 
         [HttpPut("ActualizarPerfil/{codigo}")]

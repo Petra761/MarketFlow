@@ -1,22 +1,4 @@
 ﻿import {
-  LoginPage,
-  RegisterPage,
-  RecuperarContrasenaPage,
-  RestablecerContrasenaPage,
-} from "./components/Seguridad";
-import RequireRole from "./components/RequireRole";
-import CarritoPage from "./pages/compras/CarritoPage";
-import PagoPage from "./pages/compras/PagoPage";
-import HistorialComprasPage from "./pages/compras/HistorialComprasPage";
-import DetallePedidoPage from "./pages/compras/DetallePedidoPage";
-import SellerLayout from "./components/vendedor/SellerLayout";
-import DashboardVendedorPage from "./pages/vendedor/DashboardVendedorPage";
-import InventarioPage from "./pages/vendedor/InventarioPage";
-import InventarioNuevoPage from "./pages/vendedor/InventarioNuevoPage";
-import InventarioEditarPage from "./pages/vendedor/InventarioEditarPage";
-import VentasRecibidasPage from "./pages/vendedor/VentasRecibidasPage";
-import ReportesVendedorPage from "./pages/vendedor/ReportesVendedorPage";
-import {
   BrowserRouter,
   Routes,
   Route,
@@ -24,7 +6,38 @@ import {
   NavLink,
   Outlet,
   Navigate,
+  useLocation,
+  useNavigate,
+  useSearchParams,
 } from "react-router-dom";
+import { Search, ShoppingCart } from "lucide-react";
+
+import { useAuth } from "./hooks/useAuth";
+import { useCarritoActivo } from "./hooks/useCarritoActivo";
+
+import {
+  LoginPage,
+  RegisterPage,
+  RecuperarContrasenaPage,
+  RestablecerContrasenaPage,
+  EditarPerfilPage,
+} from "./components/Seguridad";
+import RequireRole from "./components/RequireRole";
+
+import CatalogoPage from "./pages/compras/CatalogoPage";
+import ProductoDetallePage from "./pages/compras/ProductoDetallePage";
+import CarritoPage from "./pages/compras/CarritoPage";
+import PagoPage from "./pages/compras/PagoPage";
+import HistorialComprasPage from "./pages/compras/HistorialComprasPage";
+import DetallePedidoPage from "./pages/compras/DetallePedidoPage";
+
+import DashboardVendedorPage from "./pages/vendedor/DashboardVendedorPage";
+import InventarioPage from "./pages/vendedor/InventarioPage";
+import InventarioNuevoPage from "./pages/vendedor/InventarioNuevoPage";
+import InventarioEditarPage from "./pages/vendedor/InventarioEditarPage";
+import VentasRecibidasPage from "./pages/vendedor/VentasRecibidasPage";
+import ReportesVendedorPage from "./pages/vendedor/ReportesVendedorPage";
+
 import { ReportesPage } from "./pages/admin/ReportesPage";
 
 const EnEspera = ({ titulo }: { titulo: string }) => (
@@ -53,25 +66,148 @@ const PublicLayout = () => (
   </div>
 );
 
-const BuyerLayout = () => (
-  <div className="min-h-screen bg-slate-50">
-    <nav className="bg-white border-b p-4 flex justify-between items-center">
-      <Link to="/" className="font-bold text-blue-600">
-        MarketFlow Cliente
-      </Link>
-      <div className="space-x-6 text-gray-600">
-        <Link to="/carrito">Carrito</Link>
-        <Link to="/mis-pedidos">Mis Compras</Link>
-        <Link to="/perfil" className="font-medium">
-          Mi Perfil
+const BuyerLayout = () => {
+  const { totalItems } = useCarritoActivo();
+  const { logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const busqueda = searchParams.get("q") || "";
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const q = e.target.value;
+    if (location.pathname !== "/catalogo") {
+      navigate(`/catalogo?q=${encodeURIComponent(q)}`);
+    } else {
+      navigate(`?q=${encodeURIComponent(q)}`, { replace: true });
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f5f7fa] flex flex-col">
+      <nav className="bg-[#0a4f66] text-white px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-20">
+        <Link
+          to="/catalogo"
+          className="flex items-center gap-2 font-extrabold text-lg tracking-tight shrink-0"
+        >
+          <ShoppingCart size={22} /> MarketFlow
         </Link>
-      </div>
-    </nav>
-    <main className="max-w-6xl mx-auto p-6">
-      <Outlet />
-    </main>
-  </div>
-);
+        <div className="flex-1 max-w-2xl mx-6 flex items-center gap-4">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              value={busqueda}
+              onChange={handleSearch}
+              className="w-full bg-[#07384a] text-white placeholder-white/60 pl-4 pr-10 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-white/30 border-none transition-all"
+            />
+            <Search
+              size={18}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80"
+            />
+          </div>
+          <NavLink
+            to="/carrito"
+            className={({ isActive }) =>
+              `relative flex items-center transition-colors ${isActive ? "text-[#2be1a4]" : "text-white/80 hover:text-white"}`
+            }
+          >
+            <ShoppingCart size={24} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-red-600 text-white font-bold text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 shadow-sm">
+                {totalItems}
+              </span>
+            )}
+          </NavLink>
+        </div>
+        <div className="flex items-center gap-6 shrink-0">
+          <NavLink
+            to="/catalogo"
+            className={({ isActive }) =>
+              `text-sm font-medium ${isActive ? "text-[#2be1a4]" : "text-white/80 hover:text-white"}`
+            }
+          >
+            Catálogo
+          </NavLink>
+          <NavLink
+            to="/mis-pedidos"
+            className={({ isActive }) =>
+              `text-sm font-medium ${isActive ? "text-[#2be1a4]" : "text-white/80 hover:text-white"}`
+            }
+          >
+            Mis Pedidos
+          </NavLink>
+          <NavLink
+            to="/perfil"
+            className={({ isActive }) =>
+              `text-sm font-medium px-3 py-1.5 rounded-lg ${isActive ? "bg-[#2be1a4] text-[#0a4f66]" : "bg-white/10 text-white hover:bg-white/20"}`
+            }
+          >
+            Mi Perfil
+          </NavLink>
+          <button
+            onClick={logout}
+            className="text-sm font-medium text-white/80 hover:text-white cursor-pointer"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </nav>
+      <main className="max-w-6xl w-full mx-auto p-6 flex-1">
+        <Outlet />
+      </main>
+      <footer className="bg-white border-t border-gray-200 py-4 px-6 flex items-center justify-between text-xs text-gray-500">
+        <span className="font-bold text-[#0a4f66]">MarketFlow</span>
+        <span>© 2024 MarketFlow. Todos los derechos reservados.</span>
+      </footer>
+    </div>
+  );
+};
+
+const SellerLayout = () => {
+  const { logout } = useAuth();
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `text-sm font-medium transition-colors ${isActive ? "text-[#30718d]" : "text-slate-500 hover:text-slate-700"}`;
+
+  return (
+    <div className="min-h-screen bg-zinc-100">
+      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
+        <Link
+          to="/vendedor/dashboard"
+          className="text-lg font-bold text-[#30718d]"
+        >
+          MarketFlow · Vendedor
+        </Link>
+        <div className="flex items-center gap-5">
+          <NavLink to="/vendedor/dashboard" className={linkClass}>
+            Dashboard
+          </NavLink>
+          <NavLink to="/vendedor/inventario" className={linkClass}>
+            Inventario
+          </NavLink>
+          <NavLink to="/vendedor/ventas" className={linkClass}>
+            Ventas
+          </NavLink>
+          <NavLink to="/vendedor/reportes" className={linkClass}>
+            Reportes
+          </NavLink>
+          <NavLink to="/vendedor/perfil" className={linkClass}>
+            Mi Perfil
+          </NavLink>
+          <button
+            onClick={logout}
+            className="text-sm font-medium text-slate-500 hover:text-slate-700 cursor-pointer"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </header>
+      <main className="p-6 lg:p-8">
+        <Outlet />
+      </main>
+    </div>
+  );
+};
 
 const AdminLayout = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -85,39 +221,18 @@ const AdminLayout = () => {
     <div className="min-h-screen flex bg-gray-100">
       <aside className="w-64 bg-[#0b333b] text-white p-6 flex flex-col justify-between shrink-0 shadow-xl">
         <div className="space-y-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2be1a4]/10 text-[#2be1a4]">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 6a3 3 0 013-3h2.25a3 3 0 013 3v2.25a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm0 9.75a3 3 0 013-3h2.25a3 3 0 013 3V18a3 3 0 01-3 3H6a3 3 0 01-3-3v-2.25zm9.75-9.75a3 3 0 013-3H18a3 3 0 013 3v2.25a3 3 0 01-3 3h-2.25a3 3 0 01-3-3V6zM12.75 18v-2.25a3 3 0 013-3H18a3 3 0 013 3V18a3 3 0 01-3 3h-2.25a3 3 0 01-3-3z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-base font-black tracking-wide text-white leading-none">
-                MarketFlow
-              </h2>
-              <span className="text-[10px] text-teal-300 font-bold uppercase tracking-wider">
-                Admin Dashboard
-              </span>
-            </div>
-          </div>
+          <h2 className="text-base font-black tracking-wide">
+            MarketFlow Admin
+          </h2>
           <nav className="flex flex-col space-y-1.5">
             <NavLink to="/admin/resumen" className={linkClass}>
               Resumen
             </NavLink>
             <NavLink to="/admin/usuarios" className={linkClass}>
-              Gestionar Usuarios
+              Usuarios
             </NavLink>
             <NavLink to="/admin/categorias" className={linkClass}>
-              Gestionar Categorías
+              Categorías
             </NavLink>
             <NavLink to="/admin/reportes" className={linkClass}>
               Reportes
@@ -142,6 +257,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* AUTHENTICATION - Fuera de layouts */}
         <Route path="/iniciar-sesion" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registro" element={<RegisterPage />} />
@@ -163,37 +279,32 @@ function App() {
           element={<RestablecerContrasenaPage />}
         />
 
+        <Route
+          path="/perfil"
+          element={
+            <RequireRole allowed={["buyer", "seller", "admin"]}>
+              <BuyerLayout />
+            </RequireRole>
+          }
+        >
+          <Route index element={<EditarPerfilPage closePath="/catalogo" />} />
+        </Route>
+
         <Route element={<PublicLayout />}>
-          <Route path="/" element={<EnEspera titulo="Home / Landing Page" />} />
-
-          <Route
-            path="/iniciar-sesion"
-            element={<EnEspera titulo="Inicio de Sesión" />}
-          />
-
-          <Route
-            path="/registro"
-            element={<EnEspera titulo="Registro de Usuario" />}
-          />
-          <Route
-            path="/catalogo"
-            element={<EnEspera titulo="Catálogo de Productos" />}
-          />
+          <Route path="/" element={<Navigate to="/catalogo" replace />} />
           <Route
             path="/producto/:codigo"
-            element={<EnEspera titulo="Detalle del Producto" />}
+            element={<EnEspera titulo="Detalle del Producto Público" />}
           />
         </Route>
 
         <Route element={<BuyerLayout />}>
+          <Route path="/catalogo" element={<CatalogoPage />} />
+          <Route path="/catalogo/:codigo" element={<ProductoDetallePage />} />
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/pago" element={<PagoPage />} />
           <Route path="/mis-pedidos" element={<HistorialComprasPage />} />
           <Route path="/mis-pedidos/:codigo" element={<DetallePedidoPage />} />
-          <Route
-            path="/perfil"
-            element={<EnEspera titulo="Perfil y Configuración" />}
-          />
         </Route>
 
         <Route
@@ -207,34 +318,46 @@ function App() {
             path="/vendedor"
             element={<Navigate to="/vendedor/dashboard" replace />}
           />
-          <Route path="/vendedor/dashboard" element={<DashboardVendedorPage />} />
-          <Route path="/vendedor/resumen" element={<Navigate to="/vendedor/dashboard" replace />} />
+          <Route
+            path="/vendedor/dashboard"
+            element={<DashboardVendedorPage />}
+          />
+          <Route
+            path="/vendedor/resumen"
+            element={<Navigate to="/vendedor/dashboard" replace />}
+          />
           <Route path="/vendedor/inventario" element={<InventarioPage />} />
-          <Route path="/vendedor/inventario/nuevo" element={<InventarioNuevoPage />} />
+          <Route
+            path="/vendedor/inventario/nuevo"
+            element={<InventarioNuevoPage />}
+          />
           <Route
             path="/vendedor/inventario/editar/:codigo"
             element={<InventarioEditarPage />}
           />
           <Route path="/vendedor/ventas" element={<VentasRecibidasPage />} />
-          <Route
-            path="/vendedor/pedidos-recibidos"
-            element={<Navigate to="/vendedor/ventas" replace />}
-          />
           <Route path="/vendedor/reportes" element={<ReportesVendedorPage />} />
+          <Route
+            path="/vendedor/perfil"
+            element={<EditarPerfilPage closePath="/vendedor/dashboard" />}
+          />
+          <Route
+            path="/vendedor/inventario/reponer"
+            element={<EnEspera titulo="Gestión de Lotes" />}
+          />
+          <Route
+            path="/vendedor/precios"
+            element={<EnEspera titulo="Gestión de Precios" />}
+          />
         </Route>
 
         <Route
-          path="/seller/inventory"
-          element={<Navigate to="/vendedor/inventario" replace />}
-        />
-        <Route
-          path="/seller/inventory/add"
-          element={<Navigate to="/vendedor/inventario/nuevo" replace />}
-        />
-        <Route path="/cart" element={<Navigate to="/carrito" replace />} />
-        <Route path="/catalog" element={<Navigate to="/catalogo" replace />} />
-
-        <Route element={<AdminLayout />}>
+          element={
+            <RequireRole allowed={["admin"]}>
+              <AdminLayout />
+            </RequireRole>
+          }
+        >
           <Route
             path="/admin/resumen"
             element={<EnEspera titulo="Métricas Globales" />}
@@ -249,6 +372,9 @@ function App() {
           />
           <Route path="/admin/reportes" element={<ReportesPage />} />
         </Route>
+
+        <Route path="/cart" element={<Navigate to="/carrito" replace />} />
+        <Route path="/catalog" element={<Navigate to="/catalogo" replace />} />
 
         <Route
           path="*"

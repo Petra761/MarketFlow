@@ -36,6 +36,11 @@ namespace backend.Infraestructura.Repositorios
 
              public async Task<UsuarioPefirlDTO?> ObtenerUsuarioCodigo(string codigo)
         {
+            var user  = await _context.Usuario
+                .FirstOrDefaultAsync(u => u.CodigoUsuario == codigo && u.Estado == "Activo");
+            var rol = await _context.Rol
+                .FirstOrDefaultAsync(r => r.IdRol == user.IdRol);
+            
             return await (
             from u in _context.Usuario
             join tu in _context.Telefono_Usuario
@@ -47,6 +52,7 @@ namespace backend.Infraestructura.Repositorios
                 && tu.FechaFin == null
             select new UsuarioPefirlDTO
             {
+                Rol = rol.Nombre,
                 Nombre = u.Nombre,
                 Apellido = u.Apellido,
                 Nickname = u.Nickname,
@@ -92,9 +98,7 @@ namespace backend.Infraestructura.Repositorios
 
             if (existe)
             {
-                throw new Exception(
-                    "El correo ya está registrado"
-                );
+                return null;
             }
 
             var rol = await _context.Rol
@@ -144,6 +148,14 @@ namespace backend.Infraestructura.Repositorios
             await _context.SaveChangesAsync();
 
             return nuevoUsuario;
+        }
+
+        public async Task<bool> CorreoExisteAsync(string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo))
+                return false;
+
+            return await _context.Usuario.AnyAsync(u => u.Correo == correo);
         }
 
         public async Task<bool> ActualizarUsuario(string codigo, Usuario usuario)
