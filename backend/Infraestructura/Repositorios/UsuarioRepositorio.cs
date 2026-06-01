@@ -399,7 +399,7 @@ namespace backend.Infraestructura.Repositorios
                 i.IdUsuario == usuario.IdUsuario &&
                 i.Estado == "Fallido" &&
                 i.FechaIntento >
-                    DateTime.UtcNow.AddMinutes(-1)
+                    DateTime.UtcNow.AddMinutes(-15)
             );
 
             if (intentosFallidos >= 5)
