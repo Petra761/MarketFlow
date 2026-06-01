@@ -390,6 +390,8 @@ namespace backend.Infraestructura.Repositorios
                 );
 
             if (usuario == null) throw new Exception( "El correo no existe");
+
+            if (usuario.Estado != "Activo") throw new Exception( "El usuario fue bloqueado o no existe");
             
             int intentosFallidos =
             await _context.Intento_Login
