@@ -41,7 +41,6 @@ import InventarioEditarPage from "./pages/vendedor/InventarioEditarPage";
 import VentasRecibidasPage from "./pages/vendedor/VentasRecibidasPage";
 import ReportesVendedorPage from "./pages/vendedor/ReportesVendedorPage";
 
-
 const EnEspera = ({ titulo }: { titulo: string }) => (
   <div className="p-8 bg-white rounded-lg shadow-sm border border-gray-200">
     <h2 className="text-2xl font-bold text-gray-800">{titulo}</h2>
@@ -142,9 +141,10 @@ const BuyerLayout = () => {
           <NavLink
             to="/perfil"
             className={({ isActive }) =>
-              `text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${isActive
-                ? "bg-[#2be1a4] text-[#0a4f66]"
-                : "bg-white/10 text-white hover:bg-white/20"
+              `text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                isActive
+                  ? "bg-[#2be1a4] text-[#0a4f66]"
+                  : "bg-white/10 text-white hover:bg-white/20"
               }`
             }
           >
@@ -216,9 +216,10 @@ const SellerLayout = () => {
 
 const AdminLayout = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${isActive
-      ? "bg-[#2be1a4] text-[#0b333b] shadow-md shadow-[#2be1a4]/10"
-      : "text-teal-100 hover:bg-[#154650] hover:text-white"
+    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${
+      isActive
+        ? "bg-[#2be1a4] text-[#0b333b] shadow-md shadow-[#2be1a4]/10"
+        : "text-teal-100 hover:bg-[#154650] hover:text-white"
     }`;
 
   return (
@@ -292,7 +293,7 @@ function App() {
         </Route>
 
         <Route element={<PublicLayout />}>
-          <Route path="/" element={<Navigate to="/catalogo" replace />} />
+          <Route path="/" element={<Navigate to="/iniciar-sesion" replace />} />
           <Route
             path="/producto/:codigo"
             element={<EnEspera titulo="Detalle del Producto Público" />}
