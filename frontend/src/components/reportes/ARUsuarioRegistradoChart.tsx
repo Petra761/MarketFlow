@@ -88,18 +88,14 @@ export function UsuarioRegistradoChart({ data, loading = false }: Props) {
     }
 
     // El área debajo de la línea debe cerrarse en el eje X
-    areaPath = `${linePath} L ${points[points.length - 1].x} ${
-      height - paddingBottom
-    } L ${points[0].x} ${height - paddingBottom} Z`;
+    areaPath = `${linePath} L ${points[points.length - 1].x} ${height - paddingBottom
+      } L ${points[0].x} ${height - paddingBottom} Z`;
   } else if (points.length === 1) {
-    linePath = `M ${paddingLeft} ${points[0].y} L ${
-      width - paddingRight
-    } ${points[0].y}`;
-    areaPath = `M ${paddingLeft} ${points[0].y} L ${
-      width - paddingRight
-    } ${points[0].y} L ${width - paddingRight} ${
-      height - paddingBottom
-    } L ${paddingLeft} ${height - paddingBottom} Z`;
+    linePath = `M ${paddingLeft} ${points[0].y} L ${width - paddingRight
+      } ${points[0].y}`;
+    areaPath = `M ${paddingLeft} ${points[0].y} L ${width - paddingRight
+      } ${points[0].y} L ${width - paddingRight} ${height - paddingBottom
+      } L ${paddingLeft} ${height - paddingBottom} Z`;
   }
 
   // Líneas de cuadrícula horizontales
@@ -115,7 +111,7 @@ export function UsuarioRegistradoChart({ data, loading = false }: Props) {
     <ReportCard title="Crecimiento de Usuarios Activos">
       <div className="text-left mb-6">
         <p className="text-xs text-gray-400 font-medium">
-          Nuevos registros en el último periodo de 30 días
+          Tendencia de registros (Mes/Año)
         </p>
       </div>
 

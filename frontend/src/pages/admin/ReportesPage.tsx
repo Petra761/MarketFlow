@@ -13,7 +13,7 @@ import { useEstadisticasUsuarios } from "../../hooks/useEstadisticasUsuarios";
 import { useVentasResumen } from "../../hooks/useVentasResumen";
 
 export function ReportesPage() {
-  const [activePeriod, setActivePeriod] = useState<"dia" | "semana" | "mes" | "anual" | null>(null);
+  const [activePeriod, setActivePeriod] = useState<"semana" | "mes" | "anual" | null>(null);
 
   const { data, loading, error, refetch } = useVentasCategoria();
 
@@ -92,9 +92,7 @@ export function ReportesPage() {
         <VentasDetalleChart
           type={activePeriod}
           data={
-            activePeriod === "dia"
-              ? resumenData.ventasDia.rawData
-              : activePeriod === "semana"
+            activePeriod === "semana"
               ? resumenData.ventasSemana.rawData
               : activePeriod === "mes"
               ? resumenData.ventasMes.rawData

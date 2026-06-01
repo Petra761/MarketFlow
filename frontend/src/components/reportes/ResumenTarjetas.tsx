@@ -10,6 +10,7 @@ interface CardProps {
   loading: boolean;
   isActive: boolean;
   onClick: () => void;
+  isStatic?: boolean;
 }
 
 function formatMoneda(valor: number): string {
@@ -28,20 +29,25 @@ function TarjetaMetrica({
   loading,
   isActive,
   onClick,
+  isStatic = false,
 }: CardProps) {
   const isPositive = metric.tendencia >= 0;
   const trendColor = isPositive ? "text-emerald-500" : "text-rose-500";
   const trendBg = isPositive ? "bg-emerald-50" : "bg-rose-50";
 
+  const Wrapper = isStatic ? "div" : "button";
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={loading}
-      className={`flex flex-col w-full text-left justify-between rounded-2xl border p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500/20 ${
-        isActive
+    <Wrapper
+      {...(!isStatic && { type: "button" as const, onClick, disabled: loading })}
+      className={`flex flex-col w-full text-left justify-between rounded-2xl border p-6 shadow-sm transition-all duration-200 ${
+        isStatic
+          ? "border-gray-100 bg-white cursor-default"
+          : "hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+      } ${
+        !isStatic && isActive
           ? "border-[#0b333b] bg-teal-50/10 ring-2 ring-[#0b333b]/10 shadow-md"
-          : "border-gray-100 bg-white"
+          : !isStatic ? "border-gray-100 bg-white" : ""
       }`}
     >
       {/* Fila superior: Icono y Tendencia */}
@@ -85,15 +91,15 @@ function TarjetaMetrica({
           </span>
         )}
       </div>
-    </button>
+    </Wrapper>
   );
 }
 
 interface ResumenTarjetasProps {
   data: VentasResumen;
   loading: boolean;
-  activePeriod: "dia" | "semana" | "mes" | "anual" | null;
-  onSelectPeriod: (period: "dia" | "semana" | "mes" | "anual") => void;
+  activePeriod: "semana" | "mes" | "anual" | null;
+  onSelectPeriod: (period: "semana" | "mes" | "anual") => void;
 }
 
 export function ResumenTarjetas({
@@ -111,8 +117,9 @@ export function ResumenTarjetas({
         iconBg="bg-sky-50"
         iconColor="text-sky-500"
         loading={loading}
-        isActive={activePeriod === "dia"}
-        onClick={() => onSelectPeriod("dia")}
+        isActive={false}
+        isStatic
+        onClick={() => {}}
         icon={
           <svg
             xmlns="http://www.w3.org/2000/svg"
