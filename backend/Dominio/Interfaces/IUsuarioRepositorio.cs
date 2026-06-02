@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using backend.Dominio.DTOs;
+using Marketflow.Dominio.Entidades;
+
+namespace backend.Dominio.Interfaces
+{
+    public interface IUsuarioRepositorio
+    {
+        Task<List<Usuario>> ListarUsuarios();
+        Task<UsuarioPefirlDTO?> ObtenerUsuarioCodigo(string codigo);
+        Task<Usuario?> CrearUsuario(UsuarioDTO usuario);
+        Task<bool> CorreoExisteAsync(string correo);
+        Task<Rol?> ObtenerRolPorCodigo(string codigoRol);
+        Task<bool> ActualizarUsuario(string codigo, Usuario usuario);
+        Task<bool> ActualizarPerfil(string codigo, EditarPerfilDTO dto);
+        Task<bool> EliminarUsuario(string codigo);
+        Task<Usuario?> IniciarSesion(LoginDTO dto);
+        Task RecuperarCuenta(string correo);
+        Task CambiarContrasenia(CambiarContraseniaDTO dto);
+        Task<bool>BloquearUsuario(string codigo);
+        Task<bool>DesbloquearUsuario(string codigo);
+        Task<Usuario?> ObtenerPorCodigoActualizar(string codigo);
+
+
+    }
+}
